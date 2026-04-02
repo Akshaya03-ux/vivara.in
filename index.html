@@ -3,39 +3,88 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Vivara — Kurtis, Co-ords & Fabrics</title>
+<title>Vivara — Handpicked Indian Fashion</title>
+<meta name="description" content="Vivara — Handpicked kurtis, co-ords and fabrics curated with love for the modern Indian woman."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<!-- Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--rose:#C4886A;--rose-d:#8B5A42;--rose-l:#F0D9CE;--cream:#FAF6F1;--charcoal:#2C2420;--muted:#8A7A74;--border:#E8DDD8;--white:#fff;--green:#2D7A4F;--red:#C0392B}
+:root{
+  --rose:#C4886A;--rose-d:#8B5A42;--rose-l:#F0D9CE;
+  --cream:#FAF6F1;--charcoal:#2C2420;--muted:#8A7A74;
+  --border:#E8DDD8;--white:#fff;--green:#2D7A4F;--red:#C0392B;
+}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh}
 button{cursor:pointer;font-family:'DM Sans',sans-serif}
 input,select,textarea{font-family:'DM Sans',sans-serif}
+a{text-decoration:none;color:inherit}
+
+/* WHATSAPP FLOAT */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:999;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .2s}
+.wa-float:hover{transform:scale(1.1)}
+
+/* NAV */
 nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-.logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:4px;text-transform:uppercase}
+.logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:4px;text-transform:uppercase;cursor:pointer}
 .logo span{color:var(--rose)}
 .nav-links{display:flex;gap:2rem}
-.nav-link{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border:none;background:none}
+.nav-link{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border:none;background:none;transition:color .2s}
 .nav-link:hover{color:var(--charcoal)}
 .nav-right{display:flex;align-items:center;gap:1rem}
 .cart-btn{background:var(--charcoal);color:var(--white);padding:8px 20px;border-radius:2px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border:none;display:flex;align-items:center;gap:6px}
 .cart-count{background:var(--rose);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
 .nav-user-btn{font-size:12px;letter-spacing:1px;text-transform:uppercase;border:none;background:none;color:var(--charcoal)}
-.admin-btn{background:var(--rose);color:var(--white);padding:7px 16px;border-radius:2px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border:none}
+.user-dropdown{position:absolute;top:52px;right:0;background:var(--white);border:1px solid var(--border);border-radius:4px;min-width:180px;box-shadow:0 8px 32px rgba(44,36,32,.12);z-index:200}
+.user-dropdown-item{display:block;width:100%;padding:12px 16px;font-size:13px;color:var(--charcoal);border:none;background:none;text-align:left;border-bottom:1px solid var(--border)}
+.user-dropdown-item:last-child{border-bottom:none;color:var(--red)}
+.user-dropdown-item:hover{background:var(--cream)}
+.nav-user-wrap{position:relative}
+
+/* PAGES */
 .page{display:none;animation:fadeIn .3s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.hero{display:grid;grid-template-columns:1fr 1fr;min-height:500px}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:520px}
 .hero-text{background:var(--charcoal);padding:5rem 3.5rem;display:flex;flex-direction:column;justify-content:center}
 .hero-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:1.5rem}
 .hero-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;color:var(--white);line-height:1.1;margin-bottom:1.5rem}
 .hero-title em{color:var(--rose);font-style:italic}
 .hero-sub{font-size:14px;color:#9A8A84;line-height:1.7;margin-bottom:2.5rem;max-width:340px}
-.hero-cta{display:flex;gap:1rem}
-.btn-primary{background:var(--rose);color:var(--white);padding:14px 32px;border:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--rose);color:var(--white);padding:14px 32px;border:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;transition:background .2s}
+.btn-primary:hover{background:var(--rose-d)}
 .btn-ghost{background:transparent;color:var(--white);padding:14px 24px;border:1px solid #4A3A34;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px}
+.btn-ghost:hover{background:#3A2C28}
 .hero-img{background:linear-gradient(135deg,#E8D5C8,#D4A895,#C4886A);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .hero-pattern{position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(45deg,var(--charcoal) 0,var(--charcoal) 1px,transparent 0,transparent 50%);background-size:20px 20px}
+
+/* ABOUT STRIP */
+.about-strip{background:var(--rose-l);padding:3rem 2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.about-text-wrap{}
+.about-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:1rem}
+.about-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:var(--charcoal);margin-bottom:1.25rem;line-height:1.2}
+.about-body{font-size:14px;color:#5A4A44;line-height:1.9;margin-bottom:1.75rem}
+.about-links{display:flex;gap:1rem;flex-wrap:wrap}
+.about-link{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:2px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s}
+.about-link-ig{background:var(--charcoal);color:var(--white)}
+.about-link-ig:hover{background:var(--rose)}
+.about-link-wa{background:#25D366;color:var(--white)}
+.about-link-wa:hover{background:#1da851}
+.about-values{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.about-value{background:var(--white);border-radius:4px;padding:1.5rem;border:1px solid var(--border)}
+.about-value-icon{font-size:24px;margin-bottom:.75rem}
+.about-value-title{font-family:'Cormorant Garamond',serif;font-size:18px;margin-bottom:.5rem}
+.about-value-text{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* SECTION */
 .section{padding:4rem 2.5rem}
 .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2rem}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400}
@@ -46,15 +95,19 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .cat-label{position:relative;z-index:1}
 .cat-name{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--white)}
 .cat-count{font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.7)}
+
+/* FILTERS */
 .filters-bar{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:2rem;flex-wrap:wrap}
 .filter-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 .filter-chip{padding:6px 16px;border-radius:100px;font-size:12px;letter-spacing:1px;border:1px solid var(--border);background:transparent;color:var(--charcoal);transition:all .15s}
 .filter-chip:hover,.filter-chip.active{background:var(--charcoal);color:var(--white);border-color:var(--charcoal)}
+
+/* PRODUCTS */
 .products-section{padding:0 2.5rem 4rem}
 .products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
 .product-card{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(44,36,32,.1)}
-.product-img{height:240px;display:flex;align-items:center;justify-content:center;position:relative;font-family:'Cormorant Garamond',serif;font-size:52px;color:rgba(44,36,32,.2);overflow:hidden}
+.product-img{height:260px;display:flex;align-items:center;justify-content:center;position:relative;font-family:'Cormorant Garamond',serif;font-size:52px;color:rgba(44,36,32,.2);overflow:hidden}
 .product-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .product-badge{position:absolute;top:12px;left:12px;background:var(--rose);color:var(--white);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:2px;text-transform:uppercase;z-index:1}
 .sold-out-badge{position:absolute;top:12px;left:12px;background:#555;color:var(--white);font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:2px;text-transform:uppercase;z-index:1}
@@ -70,6 +123,8 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .add-btn{font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--charcoal);color:var(--charcoal);padding:6px 14px;border-radius:2px;transition:all .15s}
 .add-btn:hover{background:var(--charcoal);color:var(--white)}
 .add-btn:disabled{opacity:.4;cursor:not-allowed;border-color:var(--muted);color:var(--muted)}
+
+/* PRODUCT DETAIL */
 .detail-container{max-width:1100px;margin:0 auto;padding:3rem 2.5rem}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
 .detail-img{height:520px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:80px;color:rgba(44,36,32,.2);position:sticky;top:80px;overflow:hidden}
@@ -84,12 +139,16 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .sizes-row{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
 .size-btn{padding:8px 16px;border-radius:2px;font-size:13px;border:1px solid var(--border);background:transparent;color:var(--charcoal);transition:all .15s}
 .size-btn:hover,.size-btn.selected{background:var(--charcoal);color:var(--white);border-color:var(--charcoal)}
-.add-to-bag-btn{width:100%;background:var(--charcoal);color:var(--white);border:none;padding:18px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-bottom:12px}
+.add-to-bag-btn{width:100%;background:var(--charcoal);color:var(--white);border:none;padding:18px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-bottom:12px;transition:background .2s}
+.add-to-bag-btn:hover{background:var(--rose)}
 .add-to-bag-btn:disabled{background:#999;cursor:not-allowed}
 .wishlist-btn-lg{width:100%;background:transparent;color:var(--charcoal);border:1px solid var(--border);padding:14px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px}
 .divider{border-top:1px solid var(--border);margin:2rem 0}
 .detail-row{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid #F0E8E4}
 .detail-key{color:var(--muted)}
+.wa-order-btn{width:100%;background:#25D366;color:var(--white);border:none;padding:14px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* AI */
 .ai-section{background:var(--charcoal);padding:3rem 2.5rem}
 .ai-inner{max-width:800px;margin:0 auto;text-align:center}
 .ai-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--rose);margin-bottom:1rem}
@@ -99,12 +158,14 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .ai-chip{padding:6px 14px;border-radius:100px;border:1px solid #4A3A34;background:transparent;color:#9A8A84;font-size:12px}
 .ai-chip:hover{border-color:var(--rose);color:var(--rose)}
 .ai-row{display:flex;gap:.75rem;max-width:560px;margin:0 auto 1.5rem}
-.ai-input{flex:1;padding:12px 16px;border-radius:2px;border:1px solid #4A3A34;background:#3A2C28;color:var(--white);font-size:14px}
+.ai-input{flex:1;padding:12px 16px;border-radius:2px;border:1px solid #4A3A34;background:#3A2C28;color:var(--white);font-size:14px;outline:none}
 .ai-input::placeholder{color:#6A5A54}
 .ai-submit{background:var(--rose);color:var(--white);border:none;padding:12px 24px;border-radius:2px;font-size:12px;letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
 .ai-result{background:#3A2C28;border:1px solid #4A3A34;border-radius:4px;padding:1.5rem;text-align:left}
 .ai-result-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-bottom:.75rem}
 .ai-result-text{font-size:14px;color:#D0C0BA;line-height:1.7}
+
+/* CART SIDEBAR */
 .overlay{position:fixed;inset:0;background:rgba(44,36,32,.5);z-index:200;display:none}
 .overlay.open{display:block}
 .cart-sidebar{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:var(--white);z-index:201;transition:right .3s;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(44,36,32,.15)}
@@ -126,10 +187,15 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .cart-item-price{font-size:14px;font-weight:500}
 .cart-remove{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:none;border:none;margin-top:6px;display:block}
 .cart-footer{padding:1.5rem;border-top:1px solid var(--border)}
-.total-row{display:flex;justify-content:space-between;margin-bottom:1rem}
+.total-row{display:flex;justify-content:space-between;margin-bottom:.75rem}
 .total-label{font-size:13px;color:var(--muted)}
 .total-val{font-family:'Cormorant Garamond',serif;font-size:22px}
-.checkout-btn{width:100%;background:var(--charcoal);color:var(--white);border:none;padding:16px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px}
+.free-ship-note{font-size:11px;color:var(--green);margin-bottom:1rem}
+.checkout-btn{width:100%;background:var(--charcoal);color:var(--white);border:none;padding:16px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-bottom:10px}
+.checkout-btn:hover{background:var(--rose-d)}
+.wa-checkout-btn{width:100%;background:#25D366;color:var(--white);border:none;padding:14px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* AUTH */
 .auth-page{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:2rem}
 .auth-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:3rem;width:100%;max-width:440px}
 .auth-logo{font-family:'Cormorant Garamond',serif;font-size:28px;letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:.5rem}
@@ -142,18 +208,24 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .field input,.field select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:2px;font-size:14px;background:var(--cream);color:var(--charcoal);outline:none}
 .field input:focus{border-color:var(--rose)}
 .submit-btn{width:100%;background:var(--charcoal);color:var(--white);border:none;padding:16px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-bottom:1rem}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
 .google-btn{width:100%;background:var(--white);color:var(--charcoal);border:1px solid var(--border);padding:14px;font-size:12px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;display:flex;align-items:center;justify-content:center;gap:8px}
+.google-btn:hover{background:var(--cream)}
 .or-divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--muted);font-size:12px}
 .or-line{flex:1;height:1px;background:var(--border)}
 .error-msg{font-size:12px;color:var(--red);margin-bottom:1rem;padding:10px 14px;background:#FEF0EE;border-radius:2px}
+.success-msg{font-size:12px;color:var(--green);margin-bottom:1rem;padding:10px 14px;background:#E8F5E9;border-radius:2px}
+
+/* CHECKOUT */
 .checkout-page{max-width:1000px;margin:0 auto;padding:3rem 2.5rem}
 .checkout-grid{display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start}
 .checkout-section{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem;margin-bottom:1.5rem}
 .checkout-section-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.pay-row{display:flex;gap:8px;margin-bottom:1.25rem}
-.pay-option{flex:1;padding:12px;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
+.pay-row{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.pay-option{flex:1;padding:12px 8px;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;min-width:80px}
 .pay-option.selected{border-color:var(--rose);color:var(--rose);background:var(--rose-l)}
+.stripe-card-field{border:1px solid var(--border);border-radius:2px;padding:12px 14px;background:var(--cream);font-size:14px}
 .order-summary{background:var(--charcoal);border-radius:4px;padding:2rem;position:sticky;top:80px}
 .sum-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9A8A84;margin-bottom:1.5rem}
 .sum-item{display:flex;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #3A2C28}
@@ -166,23 +238,35 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .place-btn{width:100%;background:var(--rose);color:var(--white);border:none;padding:18px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px;margin-top:1.5rem}
 .place-btn:disabled{opacity:.6;cursor:not-allowed}
 .secure-note{font-size:11px;color:#6A5A54;text-align:center;margin-top:1rem}
+
+/* SUCCESS */
 .success-page{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:2rem}
-.success-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:4rem;max-width:500px;width:100%;text-align:center}
+.success-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:4rem;max-width:520px;width:100%;text-align:center}
+
+/* ORDERS */
 .orders-page{max-width:800px;margin:0 auto;padding:3rem 2.5rem}
 .order-card{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:1rem;overflow:hidden}
 .order-header{padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:var(--cream)}
 .order-id-text{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
 .order-date{font-size:12px;color:var(--muted)}
-.status-confirmed{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;background:#E8F5E9;color:var(--green)}
+.status-badge{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px}
+.status-confirmed{background:#E8F5E9;color:var(--green)}
+.status-pending{background:#FFF8E1;color:#F57F17}
 .order-body{padding:1.5rem}
+
+/* ACCOUNT */
 .account-page{max-width:700px;margin:0 auto;padding:3rem 2.5rem}
 .account-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem;margin-bottom:1.5rem}
 .avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--rose-l),var(--rose));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--white);margin-bottom:1.5rem}
+
+/* SIZE GUIDE */
 .sizeguide-page{max-width:800px;margin:0 auto;padding:3rem 2.5rem}
 .sg-table{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden}
 .sg-table th{padding:14px 20px;text-align:left;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:var(--cream);border-bottom:1px solid var(--border)}
 .sg-table td{padding:14px 20px;font-size:14px;border-bottom:1px solid #F0E8E4}
 .sg-table tr:nth-child(even) td{background:var(--cream)}
+
+/* ADMIN (hidden - access via URL hash) */
 .admin-overlay{position:fixed;inset:0;background:rgba(44,36,32,.65);z-index:500;display:none;align-items:center;justify-content:center}
 .admin-overlay.open{display:flex}
 .admin-panel{background:var(--white);border-radius:8px;width:95%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(44,36,32,.3)}
@@ -230,40 +314,83 @@ nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2.5r
 .add-new-btn:hover{background:var(--cream);border-color:var(--rose)}
 .img-preview{width:100%;height:140px;border:1px dashed var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;background:var(--white);margin-top:.5rem;overflow:hidden}
 .img-preview img{width:100%;height:100%;object-fit:cover}
-.img-preview-placeholder{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.img-preview-placeholder{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;padding:1rem}
+.admin-login{padding:3rem;text-align:center}
+.admin-login input{padding:12px 14px;border:1px solid var(--border);border-radius:2px;font-size:14px;background:var(--cream);width:100%;max-width:300px;display:block;margin:1rem auto;outline:none}
+
+/* TOAST */
 .toast-container{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:.5rem;align-items:center;pointer-events:none}
 .toast{background:var(--charcoal);color:var(--white);padding:12px 24px;border-radius:4px;font-size:13px;letter-spacing:.5px;animation:slideUp .3s ease;white-space:nowrap}
 .toast.success{background:var(--green)}
 .toast.error{background:var(--red)}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* FOOTER */
 footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
 .footer-brand{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:3px;color:var(--white);text-transform:uppercase;margin-bottom:.75rem}
 .footer-col-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--white);margin-bottom:1rem}
-.footer-link{display:block;font-size:13px;margin-bottom:.5rem;color:#9A8A84;background:none;border:none;text-align:left;cursor:pointer}
-.footer-bottom{border-top:1px solid #3A2C28;padding-top:1.5rem;display:flex;justify-content:space-between;font-size:12px}
+.footer-link{display:block;font-size:13px;margin-bottom:.5rem;color:#9A8A84;background:none;border:none;text-align:left;cursor:pointer;padding:0}
+.footer-link:hover{color:var(--rose-l)}
+.footer-social{display:flex;gap:.75rem;margin-top:1rem}
+.footer-social-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:none;cursor:pointer;transition:transform .2s}
+.footer-social-btn:hover{transform:scale(1.1)}
+.footer-bottom{border-top:1px solid #3A2C28;padding-top:1.5rem;display:flex;justify-content:space-between;font-size:12px;flex-wrap:wrap;gap:.5rem}
 .page-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;margin-bottom:2rem}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--rose);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr}
+  .hero-img{display:none}
+  .products-grid{grid-template-columns:repeat(2,1fr)}
+  .checkout-grid{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+  .detail-img{position:static}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .about-strip{grid-template-columns:1fr}
+  nav{padding:0 1rem}
+  .nav-links{display:none}
+  .hero-text{padding:3rem 1.5rem}
+  .hero-title{font-size:38px}
+  .section{padding:2.5rem 1rem}
+  .products-section{padding:0 1rem 2.5rem}
+}
 </style>
 </head>
 <body>
 
+<!-- WHATSAPP FLOAT -->
+<a class="wa-float" href="https://wa.me/919876543210?text=Hi%20Vivara!%20I%20want%20to%20know%20more%20about%20your%20collection." target="_blank" title="Chat on WhatsApp">&#128172;</a>
+
+<!-- NAV -->
 <nav>
-  <div class="logo">V<span>i</span>vara</div>
+  <div class="logo" onclick="showHome('all')">V<span>i</span>vara</div>
   <div class="nav-links">
     <button class="nav-link" onclick="showHome('all')">All</button>
     <button class="nav-link" onclick="showHome('kurti')">Kurtis</button>
     <button class="nav-link" onclick="showHome('coord')">Co-ords</button>
     <button class="nav-link" onclick="showHome('fabric')">Fabrics</button>
+    <button class="nav-link" onclick="showPage('page-about')">About</button>
   </div>
   <div class="nav-right">
-    <button class="nav-user-btn" id="nav-user-btn" onclick="handleNavUser()">Sign In</button>
-    <button class="admin-btn" onclick="openAdmin()">&#9881; Admin</button>
+    <div class="nav-user-wrap" id="nav-user-wrap">
+      <button class="nav-user-btn" id="nav-user-btn" onclick="handleNavUser()">Sign In</button>
+      <div class="user-dropdown" id="user-dropdown" style="display:none">
+        <button class="user-dropdown-item" onclick="goAccount()">My Account</button>
+        <button class="user-dropdown-item" onclick="goOrders()">My Orders</button>
+        <button class="user-dropdown-item" onclick="doSignOut()">Sign Out</button>
+      </div>
+    </div>
     <button class="cart-btn" onclick="openCart()">Bag <span class="cart-count" id="cart-count">0</span></button>
   </div>
 </nav>
 
+<!-- PAGES -->
 <div id="page-home" class="page active"></div>
 <div id="page-detail" class="page"></div>
+<div id="page-about" class="page"></div>
 
 <div id="page-signin" class="page">
   <div class="auth-page">
@@ -275,12 +402,19 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
         <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
       </div>
       <div id="auth-error" class="error-msg" style="display:none"></div>
+      <div id="auth-success" class="success-msg" style="display:none"></div>
       <div id="field-name" class="field" style="display:none"><label>Full Name</label><input id="auth-name" type="text" placeholder="Priya Sharma"/></div>
       <div class="field"><label>Email</label><input id="auth-email" type="email" placeholder="you@example.com"/></div>
-      <div class="field"><label>Password</label><input id="auth-password" type="password" placeholder="minimum 6 characters"/></div>
+      <div class="field"><label>Password</label><input id="auth-password" type="password" placeholder="minimum 6 characters" onkeydown="if(event.key==='Enter')handleAuth()"/></div>
       <button class="submit-btn" id="auth-submit-btn" onclick="handleAuth()">Sign In</button>
       <div class="or-divider"><div class="or-line"></div><span>or</span><div class="or-line"></div></div>
-      <button class="google-btn" onclick="handleGoogleSignIn()"><span>G</span> Continue with Google</button>
+      <button class="google-btn" onclick="handleGoogleSignIn()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:1.5rem">
+        <button onclick="showPage('page-home')" style="background:none;border:none;color:var(--rose);font-size:12px;cursor:pointer">Continue browsing without signing in</button>
+      </p>
     </div>
   </div>
 </div>
@@ -292,7 +426,8 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
     <div class="success-card">
       <div style="font-size:48px;margin-bottom:1.5rem">&#10022;</div>
       <h1 style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;margin-bottom:1rem">Order confirmed!</h1>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem">Thank you for shopping with Vivara. Your order has been received and will be dispatched within 2-3 business days.</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem">Thank you for shopping with Vivara. Your order has been received and will be dispatched within 2-3 business days.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">Questions? Chat with us on <a href="https://wa.me/919876543210" target="_blank" style="color:#25D366;font-weight:500">WhatsApp</a> or follow us on <a href="https://www.instagram.com/vivara.in/" target="_blank" style="color:var(--rose);font-weight:500">Instagram</a>.</p>
       <div id="success-order-id" style="font-size:12px;letter-spacing:2px;color:var(--rose);text-transform:uppercase;margin-bottom:2.5rem"></div>
       <button class="btn-primary" style="margin-right:12px" onclick="goOrders()">View Orders</button>
       <button onclick="showHome('all')" style="background:transparent;color:var(--charcoal);border:1px solid var(--border);padding:14px 24px;font-size:12px;letter-spacing:2px;text-transform:uppercase;border-radius:2px">Continue Shopping</button>
@@ -317,12 +452,12 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
       <button class="add-btn" style="padding:8px 20px" onclick="goOrders()">View My Orders</button>
     </div>
     <div class="account-card">
-      <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem">Edit Profile</div>
-      <div class="field"><label>Display Name</label><input id="edit-name" type="text"/></div>
-      <button class="submit-btn" style="width:auto;padding:12px 28px" onclick="saveProfile()">Save Changes</button>
+      <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem">Contact & Help</div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:1rem">Need help with an order or have a question about sizing?</p>
+      <a href="https://wa.me/919876543210?text=Hi%20Vivara!%20I%20need%20help%20with%20my%20order." target="_blank" class="wa-checkout-btn" style="display:inline-flex;text-decoration:none;padding:12px 24px;border-radius:2px;width:auto">&#128172; Chat on WhatsApp</a>
     </div>
     <div class="account-card">
-      <button style="background:transparent;color:var(--red);border:1px solid var(--red);padding:10px 24px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px" onclick="signOut()">Sign Out</button>
+      <button style="background:transparent;color:var(--red);border:1px solid var(--red);padding:10px 24px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border-radius:2px" onclick="doSignOut()">Sign Out</button>
     </div>
   </div>
 </div>
@@ -330,7 +465,7 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
 <div id="page-sizeguide" class="page">
   <div class="sizeguide-page">
     <h1 class="page-title">Size Guide</h1>
-    <p style="font-size:14px;color:var(--muted);margin-bottom:2rem;line-height:1.6">All measurements are in inches. If between sizes, size up for a relaxed fit.</p>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:2rem;line-height:1.6">All measurements in inches. Between sizes? Size up for a relaxed fit, size down for a fitted look. Still unsure? <a href="https://wa.me/919876543210?text=Hi!%20I%20need%20help%20with%20sizing." target="_blank" style="color:var(--rose)">Ask us on WhatsApp.</a></p>
     <table class="sg-table">
       <thead><tr><th>Size</th><th>Chest</th><th>Waist</th><th>Hip</th><th>Kurti Length</th></tr></thead>
       <tbody>
@@ -342,10 +477,11 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
         <tr><td style="font-weight:500">XXL</td><td>42"</td><td>36"</td><td>46"</td><td>49"</td></tr>
       </tbody>
     </table>
-    <div style="background:var(--rose-l);border:1px solid #E0C0A8;border-radius:4px;padding:1.25rem 1.5rem;margin-top:2rem;font-size:13px;color:#8B5A42;line-height:1.7"><strong>How to measure:</strong> Use a soft measuring tape. Chest around the fullest part, waist at the narrowest, hip 8 inches below the waist.</div>
+    <div style="background:var(--rose-l);border:1px solid #E0C0A8;border-radius:4px;padding:1.25rem 1.5rem;margin-top:2rem;font-size:13px;color:#8B5A42;line-height:1.7"><strong>How to measure:</strong> Use a soft measuring tape. Chest — around the fullest part. Waist — narrowest point. Hip — 8 inches below waist. Measure over the undergarments you plan to wear.</div>
   </div>
 </div>
 
+<!-- CART SIDEBAR -->
 <div class="overlay" id="cart-overlay" onclick="closeCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
   <div class="sidebar-header">
@@ -355,24 +491,34 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
   <div class="cart-items-list" id="cart-items-list"></div>
   <div class="cart-footer">
     <div class="total-row"><span class="total-label">Total</span><span class="total-val" id="cart-total">&#8377;0</span></div>
+    <div class="free-ship-note" id="free-ship-note"></div>
     <button class="checkout-btn" onclick="goCheckout()">Proceed to Checkout</button>
+    <a class="wa-checkout-btn" href="https://wa.me/919876543210?text=Hi%20Vivara!%20I%20want%20to%20place%20an%20order." target="_blank">&#128172; Order via WhatsApp</a>
   </div>
 </div>
 
+<!-- ADMIN (Hidden — access via URL: yoursite.com/#admin) -->
 <div class="admin-overlay" id="admin-overlay">
   <div class="admin-panel">
     <div class="admin-header">
-      <span class="admin-header-title">Vivara &#8212; Product Manager</span>
+      <span class="admin-header-title">Vivara &#8212; Admin</span>
       <button class="admin-close" onclick="closeAdmin()">&#10005;</button>
     </div>
-    <div class="admin-body">
+    <div id="admin-login-screen" class="admin-login">
+      <p style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:.5rem">Admin Access</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">Enter your admin password to continue.</p>
+      <input type="password" id="admin-pwd-input" placeholder="Admin password" onkeydown="if(event.key==='Enter')checkAdminPwd()"/>
+      <div id="admin-pwd-error" style="font-size:12px;color:var(--red);margin-top:.5rem;display:none">Incorrect password</div>
+      <button class="save-btn" style="margin-top:1rem" onclick="checkAdminPwd()">Enter</button>
+    </div>
+    <div id="admin-panel-body" class="admin-body" style="display:none">
       <div class="admin-sidebar">
         <div class="admin-sidebar-title">Products (<span id="admin-prod-count">0</span>)</div>
         <div class="admin-prod-list" id="admin-prod-list"></div>
         <button class="add-new-btn" onclick="adminAddNew()">+ Add New Product</button>
       </div>
       <div class="admin-main" id="admin-main">
-        <div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px">Select a product to edit, or click "Add New Product".</div>
+        <div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px">Select a product to edit, or add a new one.</div>
       </div>
     </div>
   </div>
@@ -381,573 +527,958 @@ footer{background:var(--charcoal);padding:3rem 2.5rem 1.5rem;color:#9A8A84}
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-var products=JSON.parse(localStorage.getItem('vivara_products')||'null')||[
+// ============================================================
+// CONFIG — Replace these with your real keys
+// ============================================================
+var FIREBASE_CONFIG = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+var STRIPE_KEY = "YOUR_STRIPE_PUBLISHABLE_KEY"; // pk_live_... or pk_test_...
+var WHATSAPP_NUMBER = "919876543210"; // Your number with country code, no +
+var ADMIN_PASSWORD = "vivara2025"; // Change this to your secret password
+var ANTHROPIC_KEY = ""; // Optional: paste your Claude API key for AI stylist
+// ============================================================
+
+// Init Firebase
+var firebaseReady = false;
+var db = null;
+var fbAuth = null;
+try {
+  if (FIREBASE_CONFIG.apiKey !== "YOUR_FIREBASE_API_KEY") {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    fbAuth = firebase.auth();
+    firebaseReady = true;
+    fbAuth.onAuthStateChanged(function(u) {
+      currentUser = u ? {uid: u.uid, name: u.displayName || u.email.split('@')[0], email: u.email, photoURL: u.photoURL} : null;
+      updateNav();
+      if (u) syncCartFromFirebase(u.uid);
+    });
+  }
+} catch(e) { console.warn('Firebase not configured:', e); }
+
+// Init Stripe
+var stripe = null;
+var stripeElements = null;
+var stripeCardElement = null;
+try {
+  if (STRIPE_KEY !== "YOUR_STRIPE_PUBLISHABLE_KEY") {
+    stripe = Stripe(STRIPE_KEY);
+  }
+} catch(e) {}
+
+// ============================================================
+// DATA
+// ============================================================
+var products = JSON.parse(localStorage.getItem('vivara_products') || 'null') || [
   {id:'p1',name:'Ananya Block Print Kurti',material:'Pure Cotton',price:1299,oldPrice:1699,category:'kurti',badge:'New',description:'A beautifully handcrafted block print kurti in pure cotton. Perfect for casual days and festive occasions alike. Features intricate floral motifs inspired by traditional Rajasthani art.',sizes:['XS','S','M','L','XL','XXL'],colors:['Rose','Ivory','Sage'],image:'',icon:'&#10047;',gradient:'linear-gradient(135deg,#F0D9CE,#E0B8A2)',inStock:true},
   {id:'p2',name:'Sage Green Co-ord Set',material:'Linen Blend',price:2499,oldPrice:null,category:'coord',badge:null,description:'Effortlessly chic co-ord set in soothing sage green linen blend. Includes a relaxed-fit kurta and matching palazzo pants. Ideal for brunches, outings, and travel.',sizes:['XS','S','M','L','XL'],colors:['Sage Green'],image:'',icon:'&#10087;',gradient:'linear-gradient(135deg,#D9E0D0,#B8C8A8)',inStock:true},
   {id:'p3',name:'Lavender Chikankari Kurti',material:'Georgette',price:1799,oldPrice:2299,category:'kurti',badge:'Sale',description:'Delicate Lucknowi chikankari embroidery on flowing georgette. This kurti breathes beautifully and drapes like a dream. A timeless piece for every wardrobe.',sizes:['S','M','L','XL','XXL'],colors:['Lavender','Blush'],image:'',icon:'&#10046;',gradient:'linear-gradient(135deg,#D9D0E0,#B8A8C8)',inStock:true},
-  {id:'p4',name:'Autumn Rust Co-ord',material:'Chanderi Silk',price:3299,oldPrice:null,category:'coord',badge:'New',description:'A statement co-ord set in warm rust chanderi silk. The fabric has a natural sheen that catches light beautifully. Complete with a straight-cut kurta and cigarette pants.',sizes:['XS','S','M','L','XL'],colors:['Rust'],image:'',icon:'&#10086;',gradient:'linear-gradient(135deg,#E0D9C8,#C8B890)',inStock:true},
+  {id:'p4',name:'Autumn Rust Co-ord',material:'Chanderi Silk',price:3299,oldPrice:null,category:'coord',badge:'New',description:'A statement co-ord set in warm rust chanderi silk. Natural sheen that catches light beautifully. Complete with a straight-cut kurta and cigarette pants.',sizes:['XS','S','M','L','XL'],colors:['Rust'],image:'',icon:'&#10086;',gradient:'linear-gradient(135deg,#E0D9C8,#C8B890)',inStock:true},
   {id:'p5',name:'Ivory Embroidered Kurti',material:'Mul Cotton',price:1599,oldPrice:null,category:'kurti',badge:null,description:'Pure mul cotton kurti with delicate white-on-white thread embroidery at the neckline and hem. Light as a feather, perfect for summer.',sizes:['XS','S','M','L','XL','XXL'],colors:['Ivory'],image:'',icon:'&#10036;',gradient:'linear-gradient(135deg,#E0C8C8,#C89090)',inStock:true},
   {id:'p6',name:'Sky Blue Palazzo Set',material:'Rayon',price:2199,oldPrice:2699,category:'coord',badge:'Sale',description:'Breezy sky blue co-ord set in flowing rayon. Wide-leg palazzo paired with a relaxed kurta top. Great for everyday wear and casual outings.',sizes:['S','M','L','XL'],colors:['Sky Blue'],image:'',icon:'&#10022;',gradient:'linear-gradient(135deg,#C8D9E0,#90B0C8)',inStock:true},
-  {id:'p7',name:'Banarasi Silk Fabric',material:'Pure Silk - 2.5m',price:4499,oldPrice:null,category:'fabric',badge:'Luxury',description:'Handwoven Banarasi silk with zari brocade. 2.5 meters enough for a blouse or kurti. Each piece is unique, woven by skilled artisans in Varanasi.',sizes:['2.5m'],colors:['Gold','Red','Navy'],image:'',icon:'&#10024;',gradient:'linear-gradient(135deg,#E0E0C8,#C8C890)',inStock:true},
-  {id:'p8',name:'Cotton Cambric Fabric',material:'100% Cotton - 3m',price:899,oldPrice:null,category:'fabric',badge:null,description:'Soft cotton cambric in a classic floral print. 3 meters perfect for a full kurti or suit set. Easy to stitch and maintain.',sizes:['3m'],colors:['Pink Floral','Blue Floral','Yellow Floral'],image:'',icon:'&#10040;',gradient:'linear-gradient(135deg,#D9C8E0,#B090C8)',inStock:true}
+  {id:'p7',name:'Banarasi Silk Fabric',material:'Pure Silk - 2.5m',price:4499,oldPrice:null,category:'fabric',badge:'Luxury',description:'Handwoven Banarasi silk with zari brocade. 2.5 meters — enough for a blouse or kurti. Each piece is unique, woven by skilled artisans in Varanasi.',sizes:['2.5m'],colors:['Gold','Red','Navy'],image:'',icon:'&#10024;',gradient:'linear-gradient(135deg,#E0E0C8,#C8C890)',inStock:true},
+  {id:'p8',name:'Cotton Cambric Fabric',material:'100% Cotton - 3m',price:899,oldPrice:null,category:'fabric',badge:null,description:'Soft cotton cambric in a classic floral print. 3 meters — perfect for a full kurti or suit set. Easy to stitch and maintain.',sizes:['3m'],colors:['Pink Floral','Blue Floral','Yellow Floral'],image:'',icon:'&#10040;',gradient:'linear-gradient(135deg,#D9C8E0,#B090C8)',inStock:true}
 ];
 
-var cart=JSON.parse(localStorage.getItem('vivara_cart')||'[]');
-var user=JSON.parse(localStorage.getItem('vivara_user')||'null');
-var orders=JSON.parse(localStorage.getItem('vivara_orders')||'[]');
-var currentFilter='all';
-var authMode='signin';
-var adminSelectedId=null;
+var cart = JSON.parse(localStorage.getItem('vivara_cart') || '[]');
+var currentUser = null;
+var orders = JSON.parse(localStorage.getItem('vivara_orders') || '[]');
+var currentFilter = 'all';
+var authMode = 'signin';
+var adminSelectedId = null;
+var adminUnlocked = false;
 
-function saveProducts(){localStorage.setItem('vivara_products',JSON.stringify(products));}
-function saveCart(){localStorage.setItem('vivara_cart',JSON.stringify(cart));}
-function saveUser(){localStorage.setItem('vivara_user',JSON.stringify(user));}
-function saveOrders(){localStorage.setItem('vivara_orders',JSON.stringify(orders));}
+function saveProducts() { localStorage.setItem('vivara_products', JSON.stringify(products)); }
+function saveCart() { localStorage.setItem('vivara_cart', JSON.stringify(cart)); }
+function saveOrders() { localStorage.setItem('vivara_orders', JSON.stringify(orders)); }
 
-function toast(msg,type){
-  var c=document.getElementById('toast-container');
-  var t=document.createElement('div');
-  t.className='toast'+(type?' '+type:'');
-  t.textContent=msg;
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type) {
+  var c = document.getElementById('toast-container');
+  var t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
   c.appendChild(t);
-  setTimeout(function(){t.remove();},3000);
+  setTimeout(function() { t.remove(); }, 3200);
 }
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+// ============================================================
+// PAGE ROUTING
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
+  closeUserDropdown();
 }
 
-function showHome(filter){
-  currentFilter=filter||'all';
+function showHome(filter) {
+  currentFilter = filter || 'all';
   renderHome();
   showPage('page-home');
 }
 
-function filterProducts(f){
-  if(f==='all') return products;
-  if(f==='sale') return products.filter(function(p){return p.oldPrice;});
-  if(f==='new') return products.filter(function(p){return p.badge==='New';});
-  return products.filter(function(p){return p.category===f;});
-}
-
-function productCardHTML(p){
-  var imgContent=p.image?('<img src="'+p.image+'" alt="'+p.name+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>'):p.icon;
-  var badgeHTML='';
-  if(!p.inStock){
-    badgeHTML='<div class="sold-out-badge">Sold Out</div><div class="sold-out-overlay"><div class="sold-out-text">Sold Out</div></div>';
-  } else if(p.badge){
-    badgeHTML='<div class="product-badge">'+p.badge+'</div>';
+// ============================================================
+// NAV
+// ============================================================
+function updateNav() {
+  var btn = document.getElementById('nav-user-btn');
+  if (currentUser) {
+    btn.textContent = (currentUser.name || 'Account').split(' ')[0] + ' \u25BE';
+    btn.onclick = toggleUserDropdown;
+  } else {
+    btn.textContent = 'Sign In';
+    btn.onclick = function() { showPage('page-signin'); };
   }
-  return '<div class="product-card" onclick="showDetail(\''+p.id+'\')">'
-    +'<div class="product-img" style="background:'+p.gradient+'">'
-    +imgContent+badgeHTML
-    +'<button class="wish-btn" onclick="event.stopPropagation();toast(\'Added to wishlist\')">&#9825;</button>'
-    +'</div>'
-    +'<div class="product-info">'
-    +'<div class="product-name">'+p.name+'</div>'
-    +'<div class="product-material">'+p.material+'</div>'
-    +'<div class="product-footer">'
-    +'<div class="product-price">&#8377;'+p.price.toLocaleString()+(p.oldPrice?'<span class="old-price">&#8377;'+p.oldPrice.toLocaleString()+'</span>':'')+'</div>'
-    +'<button class="add-btn" onclick="event.stopPropagation();quickAdd(\''+p.id+'\')"'+(p.inStock?'':' disabled')+'>Add</button>'
-    +'</div></div></div>';
 }
 
-function renderHome(){
-  var page=document.getElementById('page-home');
-  var filtered=filterProducts(currentFilter);
-  var titles={all:'All products',kurti:'Kurtis',coord:'Co-ord sets',fabric:'Fabrics',new:'New arrivals',sale:'On sale'};
-  var filterTitle=titles[currentFilter]||'All products';
-  var chips=['all','kurti','coord','fabric','new','sale'].map(function(f){
-    var labels={all:'All',kurti:'Kurtis',coord:'Co-ords',fabric:'Fabrics',new:'New in',sale:'On sale'};
-    return '<button class="filter-chip'+(currentFilter===f?' active':'')+'" onclick="showHome(\''+f+'\')">'+labels[f]+'</button>';
+function toggleUserDropdown() {
+  var d = document.getElementById('user-dropdown');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeUserDropdown() {
+  document.getElementById('user-dropdown').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('nav-user-wrap');
+  if (wrap && !wrap.contains(e.target)) closeUserDropdown();
+});
+
+function handleNavUser() {
+  if (currentUser) { toggleUserDropdown(); }
+  else { showPage('page-signin'); }
+}
+
+function goAccount() {
+  closeUserDropdown();
+  if (!currentUser) { showPage('page-signin'); return; }
+  document.getElementById('account-avatar').textContent = (currentUser.name || 'V').split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || 'V';
+  document.getElementById('account-name').textContent = currentUser.name;
+  document.getElementById('account-email').textContent = currentUser.email;
+  showPage('page-account');
+}
+
+function goOrders() {
+  closeUserDropdown();
+  if (!currentUser) { showPage('page-signin'); return; }
+  renderOrders();
+  showPage('page-orders');
+}
+
+// ============================================================
+// ABOUT PAGE
+// ============================================================
+function renderAbout() {
+  var page = document.getElementById('page-about');
+  page.innerHTML = '<div style="max-width:900px;margin:0 auto;padding:3rem 2.5rem">'
+    + '<button class="back-btn" onclick="showHome(\'all\')">&#8592; Back to shop</button>'
+    + '<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:48px;font-weight:300;margin-bottom:1rem;line-height:1.1">Handpicked &amp;<br><em style="color:var(--rose)">curated with love.</em></h1>'
+    + '<p style="font-size:15px;color:#5A4A44;line-height:1.9;margin-bottom:2rem;max-width:620px">Vivara was born from a deep love for Indian textiles and the women who wear them. Every piece in our collection is handpicked by us — not mass-produced, not generic. We travel, we touch, we feel the fabric before it reaches you. Whether it\'s a block-printed kurti from Jaipur, a chikankari from Lucknow, or a silk from Varanasi — every Vivara piece carries a story.</p>'
+    + '<p style="font-size:15px;color:#5A4A44;line-height:1.9;margin-bottom:2.5rem;max-width:620px">We believe fashion should feel personal. That\'s why we curate small, intentional collections — so you\'re never lost in a sea of options. Just beautiful things, chosen with care, waiting to become yours.</p>'
+    + '<div style="display:flex;gap:1rem;margin-bottom:3rem;flex-wrap:wrap">'
+    + '<a href="https://www.instagram.com/vivara.in/" target="_blank" class="about-link about-link-ig">&#128247; Follow on Instagram</a>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '?text=Hi%20Vivara!%20I%20love%20your%20collection." target="_blank" class="about-link about-link-wa">&#128172; Chat on WhatsApp</a>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">'
+    + '<div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem"><div style="font-size:28px;margin-bottom:.75rem">&#10024;</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;margin-bottom:.5rem">Handpicked</div><p style="font-size:13px;color:var(--muted);line-height:1.6">Every piece is personally selected. No fillers, no fast fashion — only what we truly love.</p></div>'
+    + '<div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem"><div style="font-size:28px;margin-bottom:.75rem">&#129504;</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;margin-bottom:.5rem">Curated with Love</div><p style="font-size:13px;color:var(--muted);line-height:1.6">From the fabric to the finish, every detail is thoughtfully chosen to delight the woman who wears it.</p></div>'
+    + '<div style="background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2rem"><div style="font-size:28px;margin-bottom:.75rem">&#127968;</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;margin-bottom:.5rem">Made in India</div><p style="font-size:13px;color:var(--muted);line-height:1.6">We celebrate Indian craftsmanship — supporting artisans and keeping heritage techniques alive.</p></div>'
+    + '</div>'
+    + '<div style="background:var(--charcoal);border-radius:4px;padding:2.5rem;text-align:center">'
+    + '<p style="font-family:\'Cormorant Garamond\',serif;font-size:28px;color:var(--white);margin-bottom:.75rem">Still have questions?</p>'
+    + '<p style="font-size:14px;color:#9A8A84;margin-bottom:1.5rem">We\'re a small team and we love hearing from you.</p>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '?text=Hi%20Vivara!%20I%20have%20a%20question." target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:14px 28px;border-radius:2px;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none">&#128172; Chat with us</a>'
+    + '</div>'
+    + '</div>'
+    + renderFooter();
+}
+
+// ============================================================
+// HOME
+// ============================================================
+function filterProducts(f) {
+  if (f === 'all') return products;
+  if (f === 'sale') return products.filter(function(p) { return p.oldPrice; });
+  if (f === 'new') return products.filter(function(p) { return p.badge === 'New'; });
+  return products.filter(function(p) { return p.category === f; });
+}
+
+function productCardHTML(p) {
+  var imgContent = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>') : p.icon;
+  var badgeHTML = '';
+  if (!p.inStock) badgeHTML = '<div class="sold-out-badge">Sold Out</div><div class="sold-out-overlay"><div class="sold-out-text">Sold Out</div></div>';
+  else if (p.badge) badgeHTML = '<div class="product-badge">' + p.badge + '</div>';
+  return '<div class="product-card" onclick="showDetail(\'' + p.id + '\')">'
+    + '<div class="product-img" style="background:' + p.gradient + '">' + imgContent + badgeHTML
+    + '<button class="wish-btn" onclick="event.stopPropagation();toast(\'Added to wishlist\')">&#9825;</button>'
+    + '</div>'
+    + '<div class="product-info">'
+    + '<div class="product-name">' + p.name + '</div>'
+    + '<div class="product-material">' + p.material + '</div>'
+    + '<div class="product-footer">'
+    + '<div class="product-price">&#8377;' + p.price.toLocaleString() + (p.oldPrice ? '<span class="old-price">&#8377;' + p.oldPrice.toLocaleString() + '</span>' : '') + '</div>'
+    + '<button class="add-btn" onclick="event.stopPropagation();quickAdd(\'' + p.id + '\')"' + (p.inStock ? '' : ' disabled') + '>Add</button>'
+    + '</div></div></div>';
+}
+
+function renderHome() {
+  var page = document.getElementById('page-home');
+  var filtered = filterProducts(currentFilter);
+  var titles = {all:'All products',kurti:'Kurtis',coord:'Co-ord sets',fabric:'Fabrics',new:'New arrivals',sale:'On sale'};
+  var filterTitle = titles[currentFilter] || 'All products';
+  var chips = ['all','kurti','coord','fabric','new','sale'].map(function(f) {
+    var lbl = {all:'All',kurti:'Kurtis',coord:'Co-ords',fabric:'Fabrics',new:'New in',sale:'On sale'}[f];
+    return '<button class="filter-chip' + (currentFilter === f ? ' active' : '') + '" onclick="showHome(\'' + f + '\')">' + lbl + '</button>';
   }).join('');
-  var cardsHTML=filtered.length?filtered.map(productCardHTML).join(''):'<p style="color:var(--muted);grid-column:1/-1;padding:2rem 0">No products found.</p>';
-  page.innerHTML='<div class="hero">'
-    +'<div class="hero-text">'
-    +'<div class="hero-eyebrow">New arrivals &#8212; Festive 2025</div>'
-    +'<h1 class="hero-title">Where every<br>thread tells<br>a <em>story.</em></h1>'
-    +'<p class="hero-sub">Handpicked kurtis, co-ords and fabrics for the modern Indian woman. Crafted with intention, worn with grace.</p>'
-    +'<div class="hero-cta">'
-    +'<button class="btn-primary" onclick="document.getElementById(\'products-section\').scrollIntoView({behavior:\'smooth\'})">Shop Now</button>'
-    +'<button class="btn-ghost" onclick="document.getElementById(\'ai-section\').scrollIntoView({behavior:\'smooth\'})">Get Styled by AI</button>'
-    +'</div></div>'
-    +'<div class="hero-img"><div class="hero-pattern"></div>'
-    +'<div style="z-index:1;text-align:center"><div style="font-family:\'Cormorant Garamond\',serif;font-size:80px;color:#fff;opacity:.6">&#10022;</div>'
-    +'<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;opacity:.7;margin-top:8px">Vivara Collection</div></div>'
-    +'</div></div>'
-    +'<div class="section"><div class="section-header"><h2 class="section-title">Shop by category</h2></div>'
-    +'<div class="cat-grid">'
-    +'<div class="cat-card" style="background:linear-gradient(160deg,#E8C9B8,#C4886A)" onclick="showHome(\'kurti\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Kurtis</div><div class="cat-count">'+products.filter(function(p){return p.category==='kurti';}).length+' styles</div></div></div>'
-    +'<div class="cat-card" style="background:linear-gradient(160deg,#B8C9D8,#6A8BA0)" onclick="showHome(\'coord\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Co-ords</div><div class="cat-count">'+products.filter(function(p){return p.category==='coord';}).length+' sets</div></div></div>'
-    +'<div class="cat-card" style="background:linear-gradient(160deg,#C8C4B8,#8A866A)" onclick="showHome(\'fabric\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Fabrics</div><div class="cat-count">'+products.filter(function(p){return p.category==='fabric';}).length+' materials</div></div></div>'
-    +'</div></div>'
-    +'<div class="products-section" id="products-section">'
-    +'<div class="section-header"><h2 class="section-title">'+filterTitle+'</h2></div>'
-    +'<div class="filters-bar"><span class="filter-label">Filter:</span>'+chips+'</div>'
-    +'<div class="products-grid">'+cardsHTML+'</div>'
-    +'</div>'
-    +'<div class="ai-section" id="ai-section"><div class="ai-inner">'
-    +'<div class="ai-eyebrow">&#10022; Vivara Style AI</div>'
-    +'<h2 class="ai-title">Your personal stylist</h2>'
-    +'<p class="ai-sub">Tell us the occasion, your style, or what you\'re looking for.</p>'
-    +'<div class="ai-chips">'
-    +['Diwali kurti','Casual brunch co-ord','Office cotton kurti','Wedding guest look'].map(function(s){return '<button class="ai-chip" onclick="document.getElementById(\'ai-input\').value=\''+s+'\'">'+s+'</button>';}).join('')
-    +'</div>'
-    +'<div class="ai-row"><input class="ai-input" id="ai-input" placeholder="e.g. Casual summer co-ord in pastels..." onkeydown="if(event.key===\'Enter\')getAI()"/>'
-    +'<button class="ai-submit" onclick="getAI()">Style me</button></div>'
-    +'<div id="ai-result" style="display:none" class="ai-result"><div class="ai-result-label">&#10022; Vivara recommends</div><div class="ai-result-text" id="ai-result-text"></div></div>'
-    +'</div></div>'
-    +renderFooter();
+  var cards = filtered.length ? filtered.map(productCardHTML).join('') : '<p style="color:var(--muted);grid-column:1/-1;padding:2rem 0">No products found.</p>';
+
+  page.innerHTML = '<div class="hero">'
+    + '<div class="hero-text">'
+    + '<div class="hero-eyebrow">Handpicked with love &#8212; Festive 2025</div>'
+    + '<h1 class="hero-title">Where every<br>thread tells<br>a <em>story.</em></h1>'
+    + '<p class="hero-sub">Curated kurtis, co-ords and fabrics for the modern Indian woman. Each piece handpicked with love.</p>'
+    + '<div class="hero-cta">'
+    + '<button class="btn-primary" onclick="document.getElementById(\'products-section\').scrollIntoView({behavior:\'smooth\'})">Shop Now</button>'
+    + '<button class="btn-ghost" onclick="showPage(\'page-about\');renderAbout()">Our Story</button>'
+    + '</div></div>'
+    + '<div class="hero-img"><div class="hero-pattern"></div>'
+    + '<div style="z-index:1;text-align:center"><div style="font-family:\'Cormorant Garamond\',serif;font-size:80px;color:#fff;opacity:.6">&#10022;</div>'
+    + '<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#fff;opacity:.7;margin-top:8px">Vivara Collection</div></div>'
+    + '</div></div>'
+
+    + '<div style="background:var(--rose-l);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">'
+    + '<p style="font-size:13px;color:#8B5A42;font-style:italic">&#10022; Handpicked &amp; curated with love &#10022; Free shipping on orders above &#8377;999 &#10022; Easy returns within 7 days</p>'
+    + '<a href="https://www.instagram.com/vivara.in/" target="_blank" style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--rose-d);display:flex;align-items:center;gap:6px;text-decoration:none">&#128247; @vivara.in</a>'
+    + '</div>'
+
+    + '<div class="section"><div class="section-header"><h2 class="section-title">Shop by category</h2></div>'
+    + '<div class="cat-grid">'
+    + '<div class="cat-card" style="background:linear-gradient(160deg,#E8C9B8,#C4886A)" onclick="showHome(\'kurti\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Kurtis</div><div class="cat-count">' + products.filter(function(p){return p.category==='kurti';}).length + ' styles</div></div></div>'
+    + '<div class="cat-card" style="background:linear-gradient(160deg,#B8C9D8,#6A8BA0)" onclick="showHome(\'coord\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Co-ords</div><div class="cat-count">' + products.filter(function(p){return p.category==='coord';}).length + ' sets</div></div></div>'
+    + '<div class="cat-card" style="background:linear-gradient(160deg,#C8C4B8,#8A866A)" onclick="showHome(\'fabric\')"><div class="cat-overlay"></div><div class="cat-label"><div class="cat-name">Fabrics</div><div class="cat-count">' + products.filter(function(p){return p.category==='fabric';}).length + ' materials</div></div></div>'
+    + '</div></div>'
+
+    + '<div class="products-section" id="products-section">'
+    + '<div class="section-header"><h2 class="section-title">' + filterTitle + '</h2></div>'
+    + '<div class="filters-bar"><span class="filter-label">Filter:</span>' + chips + '</div>'
+    + '<div class="products-grid">' + cards + '</div>'
+    + '</div>'
+
+    + '<div class="ai-section" id="ai-section"><div class="ai-inner">'
+    + '<div class="ai-eyebrow">&#10022; Vivara Style AI</div>'
+    + '<h2 class="ai-title">Your personal stylist</h2>'
+    + '<p class="ai-sub">Tell us the occasion or your style — we\'ll find the perfect pick.</p>'
+    + '<div class="ai-chips">'
+    + ['Diwali kurti','Casual brunch co-ord','Office cotton kurti','Wedding guest look'].map(function(s){return '<button class="ai-chip" onclick="document.getElementById(\'ai-input\').value=\''+s+'\'">'+s+'</button>';}).join('')
+    + '</div>'
+    + '<div class="ai-row"><input class="ai-input" id="ai-input" placeholder="e.g. Casual summer kurti in pastels..." onkeydown="if(event.key===\'Enter\')getAI()"/>'
+    + '<button class="ai-submit" onclick="getAI()">Style me</button></div>'
+    + '<div id="ai-result" style="display:none" class="ai-result"><div class="ai-result-label">&#10022; Vivara recommends</div><div class="ai-result-text" id="ai-result-text"></div></div>'
+    + '</div></div>'
+
+    + renderFooter();
 }
 
-function quickAdd(id){
-  var p=products.find(function(x){return x.id===id;});
-  if(!p||!p.inStock) return;
-  addToCart(p,p.sizes&&p.sizes[2]?p.sizes[2]:'M');
-  toast(p.name+' added to bag');
+function quickAdd(id) {
+  var p = products.find(function(x) { return x.id === id; });
+  if (!p || !p.inStock) return;
+  addToCart(p, p.sizes && p.sizes[1] ? p.sizes[1] : 'M');
+  toast(p.name + ' added to bag');
 }
 
-function showDetail(id){
-  var p=products.find(function(x){return x.id===id;});
-  if(!p) return;
-  var page=document.getElementById('page-detail');
-  var imgContent=p.image?('<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover"/>'):p.icon;
-  var badgeHTML='';
-  if(!p.inStock) badgeHTML='<div class="detail-badge" style="background:#555">Sold Out</div>';
-  else if(p.badge) badgeHTML='<div class="detail-badge">'+p.badge+'</div>';
-  var sizeBtns=(p.sizes||[]).map(function(s,i){return '<button class="size-btn'+(i===2?' selected':'')+'" onclick="selectSize(this)">'+s+'</button>';}).join('');
-  var colorBtns=(p.colors||[]).map(function(c,i){return '<button class="size-btn'+(i===0?' selected':'')+'" onclick="selectSize(this)">'+c+'</button>';}).join('');
-  var detailRows=[['Material',p.material],['Care','Dry clean or gentle hand wash'],['Origin','Made in India'],['Category',{kurti:'Kurti',coord:'Co-ord set',fabric:'Fabric'}[p.category]||p.category]].map(function(r){return '<div class="detail-row"><span class="detail-key">'+r[0]+'</span><span>'+r[1]+'</span></div>';}).join('');
-  page.innerHTML='<div class="detail-container">'
-    +'<button class="back-btn" onclick="showHome(\''+currentFilter+'\')">&#8592; Back</button>'
-    +'<div class="detail-grid">'
-    +'<div class="detail-img" style="background:'+p.gradient+'">'+imgContent+'</div>'
-    +'<div>'+badgeHTML
-    +'<h1 class="detail-name">'+p.name+'</h1>'
-    +'<div class="detail-material">'+p.material+'</div>'
-    +'<div class="detail-price">&#8377;'+p.price.toLocaleString()+(p.oldPrice?' <span style="font-size:18px;color:var(--muted);text-decoration:line-through;font-weight:300">&#8377;'+p.oldPrice.toLocaleString()+'</span>':'')+'</div>'
-    +'<p class="detail-desc">'+p.description+'</p>'
-    +(colorBtns?'<div class="detail-label">Colour</div><div class="sizes-row">'+colorBtns+'</div>':'')
-    +'<div class="detail-label">Size</div>'
-    +'<div class="sizes-row" id="size-row">'+sizeBtns+'</div>'
-    +'<button class="add-to-bag-btn" onclick="detailAdd(\''+p.id+'\')"'+(p.inStock?'':' disabled')+'>'+(p.inStock?'Add to Bag':'Sold Out')+'</button>'
-    +'<button class="wishlist-btn-lg" onclick="toast(\'Added to wishlist\')">&#9825; Add to Wishlist</button>'
-    +'<div class="divider"></div>'
-    +'<div class="detail-label">Product details</div>'+detailRows
-    +'</div></div></div>'+renderFooter();
+// ============================================================
+// PRODUCT DETAIL
+// ============================================================
+function showDetail(id) {
+  var p = products.find(function(x) { return x.id === id; });
+  if (!p) return;
+  var page = document.getElementById('page-detail');
+  var imgContent = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:cover"/>') : p.icon;
+  var badgeHTML = !p.inStock ? '<div class="detail-badge" style="background:#555">Sold Out</div>' : (p.badge ? '<div class="detail-badge">' + p.badge + '</div>' : '');
+  var sizeBtns = (p.sizes || []).map(function(s, i) { return '<button class="size-btn' + (i === 1 ? ' selected' : '') + '" onclick="selectSize(this)">' + s + '</button>'; }).join('');
+  var colorBtns = (p.colors || []).map(function(c, i) { return '<button class="size-btn' + (i === 0 ? ' selected' : '') + '" onclick="selectSize(this)">' + c + '</button>'; }).join('');
+  var detailRows = [['Material',p.material],['Care','Dry clean or gentle hand wash'],['Origin','Made in India'],['Category',{kurti:'Kurti',coord:'Co-ord set',fabric:'Fabric'}[p.category]||p.category]].map(function(r){return '<div class="detail-row"><span class="detail-key">'+r[0]+'</span><span>'+r[1]+'</span></div>';}).join('');
+  var waText = encodeURIComponent('Hi Vivara! I want to order: ' + p.name + ' (₹' + p.price + '). Is it available?');
+
+  page.innerHTML = '<div class="detail-container">'
+    + '<button class="back-btn" onclick="showHome(\'' + currentFilter + '\')">&#8592; Back</button>'
+    + '<div class="detail-grid">'
+    + '<div class="detail-img" style="background:' + p.gradient + '">' + imgContent + '</div>'
+    + '<div>' + badgeHTML
+    + '<h1 class="detail-name">' + p.name + '</h1>'
+    + '<div class="detail-material">' + p.material + '</div>'
+    + '<div class="detail-price">&#8377;' + p.price.toLocaleString() + (p.oldPrice ? ' <span style="font-size:18px;color:var(--muted);text-decoration:line-through;font-weight:300">&#8377;' + p.oldPrice.toLocaleString() + '</span>' : '') + '</div>'
+    + '<p class="detail-desc">' + p.description + '</p>'
+    + (colorBtns ? '<div class="detail-label">Colour</div><div class="sizes-row">' + colorBtns + '</div>' : '')
+    + '<div class="detail-label">Size <button onclick="showPage(\'page-sizeguide\')" style="background:none;border:none;font-size:11px;color:var(--rose);letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-left:8px">Size Guide</button></div>'
+    + '<div class="sizes-row" id="size-row">' + sizeBtns + '</div>'
+    + '<button class="add-to-bag-btn" onclick="detailAdd(\'' + p.id + '\')"' + (p.inStock ? '' : ' disabled') + '>' + (p.inStock ? 'Add to Bag' : 'Sold Out') + '</button>'
+    + '<a class="wa-order-btn" href="https://wa.me/' + WHATSAPP_NUMBER + '?text=' + waText + '" target="_blank">&#128172; Order via WhatsApp</a>'
+    + '<button class="wishlist-btn-lg" onclick="toast(\'Added to wishlist\')">&#9825; Add to Wishlist</button>'
+    + '<div class="divider"></div>'
+    + '<div class="detail-label">Product details</div>' + detailRows
+    + '</div></div></div>' + renderFooter();
   showPage('page-detail');
 }
 
-function selectSize(btn){
-  var row=btn.closest('.sizes-row');
-  row.querySelectorAll('.size-btn').forEach(function(b){b.classList.remove('selected');});
+function selectSize(btn) {
+  btn.closest('.sizes-row').querySelectorAll('.size-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
 }
 
-function detailAdd(id){
-  var p=products.find(function(x){return x.id===id;});
-  if(!p||!p.inStock) return;
-  var sel=document.querySelector('#size-row .size-btn.selected');
-  var size=sel?sel.textContent:(p.sizes&&p.sizes[0]?p.sizes[0]:'M');
-  addToCart(p,size);
-  toast(p.name+' added to bag');
+function detailAdd(id) {
+  var p = products.find(function(x) { return x.id === id; });
+  if (!p || !p.inStock) return;
+  var sel = document.querySelector('#size-row .size-btn.selected');
+  var size = sel ? sel.textContent : (p.sizes && p.sizes[0] ? p.sizes[0] : 'M');
+  addToCart(p, size);
+  toast(p.name + ' added to bag');
 }
 
-function addToCart(p,size){
-  var key=p.id+'_'+size;
-  var ex=cart.find(function(i){return i.key===key;});
-  if(ex){ex.qty++;}
-  else{cart.push(Object.assign({},p,{size:size,qty:1,key:key}));}
-  saveCart();updateCartUI();
+// ============================================================
+// CART
+// ============================================================
+function addToCart(p, size) {
+  var key = p.id + '_' + size;
+  var ex = cart.find(function(i) { return i.key === key; });
+  if (ex) ex.qty++;
+  else cart.push(Object.assign({}, p, {size: size, qty: 1, key: key}));
+  saveCart();
+  updateCartUI();
+  if (currentUser && firebaseReady) syncCartToFirebase(currentUser.uid);
 }
 
-function removeFromCart(key){
-  cart=cart.filter(function(i){return i.key!==key;});
-  saveCart();updateCartUI();renderCartItems();
+function removeFromCart(key) {
+  cart = cart.filter(function(i) { return i.key !== key; });
+  saveCart(); updateCartUI(); renderCartItems();
 }
 
-function updateQty(key,qty){
-  if(qty<1){removeFromCart(key);return;}
-  var item=cart.find(function(x){return x.key===key;});
-  if(item){item.qty=qty;saveCart();updateCartUI();renderCartItems();}
+function updateQty(key, qty) {
+  if (qty < 1) { removeFromCart(key); return; }
+  var item = cart.find(function(x) { return x.key === key; });
+  if (item) { item.qty = qty; saveCart(); updateCartUI(); renderCartItems(); }
 }
 
-function openCart(){
+function openCart() {
   document.getElementById('cart-overlay').classList.add('open');
   document.getElementById('cart-sidebar').classList.add('open');
   renderCartItems();
+  closeUserDropdown();
 }
 
-function closeCart(){
+function closeCart() {
   document.getElementById('cart-overlay').classList.remove('open');
   document.getElementById('cart-sidebar').classList.remove('open');
 }
 
-function updateCartUI(){
-  var count=cart.reduce(function(s,i){return s+i.qty;},0);
-  var total=cart.reduce(function(s,i){return s+i.price*i.qty;},0);
-  document.getElementById('cart-count').textContent=count;
-  document.getElementById('cart-total').textContent='&#8377;'+total.toLocaleString();
+function updateCartUI() {
+  var count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
+  var total = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+  document.getElementById('cart-count').textContent = count;
+  document.getElementById('cart-total').textContent = '&#8377;' + total.toLocaleString();
+  var note = document.getElementById('free-ship-note');
+  if (note) {
+    if (total >= 999) note.textContent = '&#10003; Free shipping applied!';
+    else note.textContent = 'Add &#8377;' + (999 - total) + ' more for free shipping';
+  }
 }
 
-function renderCartItems(){
-  var el=document.getElementById('cart-items-list');
-  if(!cart.length){el.innerHTML='<div class="cart-empty">Your bag is empty</div>';return;}
-  el.innerHTML=cart.map(function(item){
-    var imgContent=item.image?('<img src="'+item.image+'" alt="'+item.name+'"/>'):item.icon;
+function renderCartItems() {
+  var el = document.getElementById('cart-items-list');
+  if (!cart.length) { el.innerHTML = '<div class="cart-empty">Your bag is empty.<br><br>Browse our handpicked collection.</div>'; return; }
+  el.innerHTML = cart.map(function(item) {
+    var img = item.image ? ('<img src="' + item.image + '" alt="' + item.name + '"/>') : item.icon;
     return '<div class="cart-item">'
-      +'<div class="cart-item-img" style="background:'+item.gradient+'">'+imgContent+'</div>'
-      +'<div class="cart-item-info">'
-      +'<div class="cart-item-name">'+item.name+'</div>'
-      +'<div class="cart-item-meta">'+item.material+' &middot; Size '+item.size+'</div>'
-      +'<div class="cart-item-row">'
-      +'<div class="qty-row">'
-      +'<button class="qty-btn" onclick="updateQty(\''+item.key+'\','+(item.qty-1)+')">&#8722;</button>'
-      +'<span style="font-size:14px;min-width:20px;text-align:center">'+item.qty+'</span>'
-      +'<button class="qty-btn" onclick="updateQty(\''+item.key+'\','+(item.qty+1)+')">+</button>'
-      +'</div>'
-      +'<div class="cart-item-price">&#8377;'+(item.price*item.qty).toLocaleString()+'</div>'
-      +'</div>'
-      +'<button class="cart-remove" onclick="removeFromCart(\''+item.key+'\')">Remove</button>'
-      +'</div></div>';
+      + '<div class="cart-item-img" style="background:' + item.gradient + '">' + img + '</div>'
+      + '<div class="cart-item-info">'
+      + '<div class="cart-item-name">' + item.name + '</div>'
+      + '<div class="cart-item-meta">' + item.material + ' &middot; Size ' + item.size + '</div>'
+      + '<div class="cart-item-row">'
+      + '<div class="qty-row">'
+      + '<button class="qty-btn" onclick="updateQty(\'' + item.key + '\',' + (item.qty - 1) + ')">&#8722;</button>'
+      + '<span style="font-size:14px;min-width:20px;text-align:center">' + item.qty + '</span>'
+      + '<button class="qty-btn" onclick="updateQty(\'' + item.key + '\',' + (item.qty + 1) + ')">+</button>'
+      + '</div>'
+      + '<div class="cart-item-price">&#8377;' + (item.price * item.qty).toLocaleString() + '</div>'
+      + '</div>'
+      + '<button class="cart-remove" onclick="removeFromCart(\'' + item.key + '\')">Remove</button>'
+      + '</div></div>';
   }).join('');
 }
 
-function goCheckout(){
+function goCheckout() {
   closeCart();
-  if(!user){showPage('page-signin');toast('Please sign in to checkout','error');return;}
-  if(!cart.length){toast('Your bag is empty','error');return;}
-  renderCheckout();showPage('page-checkout');
+  if (!cart.length) { toast('Your bag is empty', 'error'); return; }
+  renderCheckout();
+  showPage('page-checkout');
 }
 
-function renderCheckout(){
-  var page=document.getElementById('page-checkout');
-  var subtotal=cart.reduce(function(s,i){return s+i.price*i.qty;},0);
-  var shipping=subtotal>999?0:99;
-  var grand=subtotal+shipping;
-  var itemsHTML=cart.map(function(item){return '<div class="sum-item"><div><div class="sum-item-name">'+item.name+'</div><div class="sum-item-meta">Size '+item.size+' &middot; Qty '+item.qty+'</div></div><div class="sum-item-price">&#8377;'+(item.price*item.qty).toLocaleString()+'</div></div>';}).join('');
-  page.innerHTML='<div class="checkout-page"><h1 class="page-title">Checkout</h1>'
-    +'<div class="checkout-grid"><div>'
-    +'<div class="checkout-section"><div class="checkout-section-title">Delivery address</div>'
-    +'<div class="field"><label>Full Name</label><input id="co-name" value="'+(user&&user.name?user.name:'')+'" required/></div>'
-    +'<div class="field"><label>Email</label><input id="co-email" type="email" value="'+(user&&user.email?user.email:'')+'" required/></div>'
-    +'<div class="row2"><div class="field"><label>Phone</label><input id="co-phone" type="tel" placeholder="+91 98765 43210"/></div>'
-    +'<div class="field"><label>Pincode</label><input id="co-pin" placeholder="600001"/></div></div>'
-    +'<div class="field"><label>Address</label><input id="co-addr" placeholder="House/Flat no, Street, Area"/></div>'
-    +'<div class="row2"><div class="field"><label>City</label><input id="co-city"/></div>'
-    +'<div class="field"><label>State</label><input id="co-state"/></div></div>'
-    +'</div>'
-    +'<div class="checkout-section"><div class="checkout-section-title">Payment</div>'
-    +'<div class="pay-row" id="pay-row">'
-    +'<button type="button" class="pay-option selected" onclick="selectPay(\'card\',this)">&#128179; Card</button>'
-    +'<button type="button" class="pay-option" onclick="selectPay(\'upi\',this)">&#128241; UPI</button>'
-    +'<button type="button" class="pay-option" onclick="selectPay(\'cod\',this)">&#127968; Cash on Delivery</button>'
-    +'</div>'
-    +'<div id="pay-card-fields">'
-    +'<div class="field"><label>Card Number</label><input id="co-card" placeholder="4242 4242 4242 4242"/></div>'
-    +'<div class="row2"><div class="field"><label>Expiry</label><input id="co-exp" placeholder="MM/YY"/></div>'
-    +'<div class="field"><label>CVC</label><input id="co-cvc" placeholder="123"/></div></div>'
-    +'</div>'
-    +'<div id="pay-upi-fields" style="display:none"><div class="field"><label>UPI ID</label><input id="co-upi" placeholder="yourname@paytm"/></div></div>'
-    +'<div id="pay-cod-fields" style="display:none"><p style="font-size:13px;color:var(--muted);line-height:1.6">Pay in cash when your order arrives. Extra &#8377;50 COD charge may apply.</p></div>'
-    +'</div></div>'
-    +'<div class="order-summary"><div class="sum-title">Order summary</div>'
-    +itemsHTML
-    +'<div class="sum-total-row" style="padding-top:.75rem;border-top:1px solid #3A2C28"><span class="sum-total-label">Subtotal</span><span style="color:#D0C0BA;font-size:14px">&#8377;'+subtotal.toLocaleString()+'</span></div>'
-    +'<div class="sum-total-row" style="margin-top:.5rem"><span class="sum-total-label">Shipping</span><span style="color:#D0C0BA;font-size:14px">'+(shipping===0?'Free':'&#8377;'+shipping)+'</span></div>'
-    +(shipping===0?'<div style="font-size:11px;color:#6A5A54;margin-top:4px">Free shipping on orders above &#8377;999</div>':'')
-    +'<div class="sum-total-row" style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #3A2C28"><span class="sum-total-label" style="font-size:13px">Total</span><span class="sum-grand">&#8377;'+grand.toLocaleString()+'</span></div>'
-    +'<button class="place-btn" onclick="placeOrder('+grand+')">Place Order</button>'
-    +'<div class="secure-note">&#128274; Secured checkout</div>'
-    +'</div></div></div>';
+// ============================================================
+// FIREBASE CART SYNC
+// ============================================================
+function syncCartToFirebase(uid) {
+  if (!db) return;
+  db.collection('carts').doc(uid).set({items: cart, updatedAt: new Date()}).catch(function(){});
 }
 
-function selectPay(v,btn){
-  document.querySelectorAll('.pay-option').forEach(function(b){b.classList.remove('selected');});
+function syncCartFromFirebase(uid) {
+  if (!db) return;
+  db.collection('carts').doc(uid).get().then(function(doc) {
+    if (doc.exists) {
+      var fbCart = doc.data().items || [];
+      if (fbCart.length > 0) {
+        cart = fbCart;
+        saveCart();
+        updateCartUI();
+      }
+    }
+  }).catch(function(){});
+}
+
+// ============================================================
+// CHECKOUT
+// ============================================================
+function renderCheckout() {
+  var page = document.getElementById('page-checkout');
+  var subtotal = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
+  var shipping = subtotal >= 999 ? 0 : 99;
+  var grand = subtotal + shipping;
+
+  var itemsHTML = cart.map(function(item) {
+    return '<div class="sum-item"><div><div class="sum-item-name">' + item.name + '</div><div class="sum-item-meta">Size ' + item.size + ' &middot; Qty ' + item.qty + '</div></div><div class="sum-item-price">&#8377;' + (item.price * item.qty).toLocaleString() + '</div></div>';
+  }).join('');
+
+  var userName = currentUser ? currentUser.name : '';
+  var userEmail = currentUser ? currentUser.email : '';
+
+  page.innerHTML = '<div class="checkout-page"><h1 class="page-title">Checkout</h1>'
+    + '<div class="checkout-grid"><div>'
+    + '<div class="checkout-section"><div class="checkout-section-title">Delivery address</div>'
+    + '<div class="field"><label>Full Name</label><input id="co-name" value="' + userName + '" required/></div>'
+    + '<div class="field"><label>Email</label><input id="co-email" type="email" value="' + userEmail + '" required/></div>'
+    + '<div class="row2"><div class="field"><label>Phone</label><input id="co-phone" type="tel" placeholder="+91 98765 43210"/></div>'
+    + '<div class="field"><label>Pincode</label><input id="co-pin" placeholder="600001"/></div></div>'
+    + '<div class="field"><label>Address</label><input id="co-addr" placeholder="House no, Street, Area"/></div>'
+    + '<div class="row2"><div class="field"><label>City</label><input id="co-city"/></div>'
+    + '<div class="field"><label>State</label><input id="co-state"/></div></div>'
+    + '</div>'
+    + '<div class="checkout-section"><div class="checkout-section-title">Payment</div>'
+    + '<div class="pay-row" id="pay-row">'
+    + '<button type="button" class="pay-option selected" onclick="selectPay(\'card\',this)">&#128179; Card</button>'
+    + '<button type="button" class="pay-option" onclick="selectPay(\'upi\',this)">&#128241; UPI</button>'
+    + '<button type="button" class="pay-option" onclick="selectPay(\'wa\',this)">&#128172; WhatsApp</button>'
+    + '<button type="button" class="pay-option" onclick="selectPay(\'cod\',this)">&#127968; COD</button>'
+    + '</div>'
+    + '<div id="pay-card-fields">'
+    + (stripe ? '<div class="field"><label>Card details (secured by Stripe)</label><div id="stripe-card-element" class="stripe-card-field"></div><div id="stripe-error" style="font-size:12px;color:var(--red);margin-top:.5rem"></div></div>' : '<div class="field"><label>Card Number</label><input id="co-card" placeholder="4242 4242 4242 4242"/></div><div class="row2"><div class="field"><label>Expiry</label><input id="co-exp" placeholder="MM/YY"/></div><div class="field"><label>CVC</label><input id="co-cvc" placeholder="123"/></div></div>')
+    + '</div>'
+    + '<div id="pay-upi-fields" style="display:none"><div class="field"><label>7667462937</label><input id="co-upi" placeholder="yourname@paytm"/></div><p style="font-size:12px;color:var(--muted);margin-top:.5rem">You will receive a payment request on your UPI app after placing the order.</p></div>'
+    + '<div id="pay-wa-fields" style="display:none"><p style="font-size:13px;color:#5A4A44;line-height:1.7;padding:1rem;background:#E8F5E9;border-radius:4px">After placing the order, you will be redirected to WhatsApp to confirm and pay via UPI/bank transfer directly to Vivara.</p></div>'
+    + '<div id="pay-cod-fields" style="display:none"><p style="font-size:13px;color:var(--muted);line-height:1.6;padding:1rem;background:var(--cream);border-radius:4px">Pay in cash when your order arrives. A nominal &#8377;50 COD handling fee applies.</p></div>'
+    + '</div></div>'
+    + '<div class="order-summary"><div class="sum-title">Order summary</div>'
+    + itemsHTML
+    + '<div class="sum-total-row" style="padding-top:.75rem;border-top:1px solid #3A2C28"><span class="sum-total-label">Subtotal</span><span style="color:#D0C0BA;font-size:14px">&#8377;' + subtotal.toLocaleString() + '</span></div>'
+    + '<div class="sum-total-row" style="margin-top:.5rem"><span class="sum-total-label">Shipping</span><span style="color:#D0C0BA;font-size:14px">' + (shipping === 0 ? 'Free &#10003;' : '&#8377;' + shipping) + '</span></div>'
+    + '<div class="sum-total-row" style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #3A2C28"><span class="sum-total-label" style="font-size:13px">Total</span><span class="sum-grand">&#8377;' + grand.toLocaleString() + '</span></div>'
+    + '<button class="place-btn" id="place-btn" onclick="placeOrder(' + grand + ')">Place Order</button>'
+    + '<div class="secure-note">&#128274; Secured &amp; encrypted</div>'
+    + '<a href="https://wa.me/' + 7667462937 + '?text=' + encodeURIComponent('Hi Vivara! I want to place an order for: ' + cart.map(function(i){return i.name + ' x' + i.qty;}).join(', ') + '. Total: ₹' + grand) + '" target="_blank" style="display:block;text-align:center;margin-top:1rem;font-size:12px;color:#9A8A84;text-decoration:none">Or order directly via &#128172; WhatsApp</a>'
+    + '</div></div></div>';
+
+  // Mount Stripe Elements if available
+  if (stripe) {
+    setTimeout(function() {
+      try {
+        stripeElements = stripe.elements();
+        stripeCardElement = stripeElements.create('card', {
+          style: { base: { fontSize: '14px', color: '#2C2420', fontFamily: 'DM Sans, sans-serif' } }
+        });
+        stripeCardElement.mount('#stripe-card-element');
+      } catch(e) {}
+    }, 100);
+  }
+}
+
+function selectPay(v, btn) {
+  document.querySelectorAll('.pay-option').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
-  document.getElementById('pay-card-fields').style.display=v==='card'?'block':'none';
-  document.getElementById('pay-upi-fields').style.display=v==='upi'?'block':'none';
-  document.getElementById('pay-cod-fields').style.display=v==='cod'?'block':'none';
+  document.getElementById('pay-card-fields').style.display = v === 'card' ? 'block' : 'none';
+  document.getElementById('pay-upi-fields').style.display = v === 'upi' ? 'block' : 'none';
+  document.getElementById('pay-wa-fields').style.display = v === 'wa' ? 'block' : 'none';
+  document.getElementById('pay-cod-fields').style.display = v === 'cod' ? 'block' : 'none';
 }
 
-function placeOrder(grand){
-  var name=document.getElementById('co-name')&&document.getElementById('co-name').value;
-  var email=document.getElementById('co-email')&&document.getElementById('co-email').value;
-  if(!name||!email){toast('Please fill in name and email','error');return;}
-  var btn=document.querySelector('.place-btn');
-  btn.disabled=true;btn.textContent='Placing order...';
-  setTimeout(function(){
-    var orderId='ORD'+(Date.now()+'').slice(-8).toUpperCase();
-    var order={id:orderId,items:cart.slice(),total:grand,date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}),status:'confirmed',address:{name:name,email:email}};
-    orders.unshift(order);saveOrders();
-    cart=[];saveCart();updateCartUI();
-    document.getElementById('success-order-id').textContent='Order #'+orderId;
-    showPage('page-success');
-    toast('Order placed successfully!','success');
-  },1500);
+function placeOrder(grand) {
+  var name = document.getElementById('co-name') && document.getElementById('co-name').value.trim();
+  var email = document.getElementById('co-email') && document.getElementById('co-email').value.trim();
+  var phone = document.getElementById('co-phone') && document.getElementById('co-phone').value.trim();
+  var addr = document.getElementById('co-addr') && document.getElementById('co-addr').value.trim();
+  var city = document.getElementById('co-city') && document.getElementById('co-city').value.trim();
+  var state = document.getElementById('co-state') && document.getElementById('co-state').value.trim();
+  var pin = document.getElementById('co-pin') && document.getElementById('co-pin').value.trim();
+
+  if (!name || !email) { toast('Please fill in your name and email', 'error'); return; }
+  if (!phone) { toast('Please enter your phone number', 'error'); return; }
+  if (!addr || !city || !pin) { toast('Please fill in your delivery address', 'error'); return; }
+
+  var btn = document.getElementById('place-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Processing...'; }
+
+  // Determine payment method
+  var payMethod = 'card';
+  var selected = document.querySelector('.pay-option.selected');
+  if (selected) {
+    var txt = selected.textContent.toLowerCase();
+    if (txt.indexOf('upi') > -1) payMethod = 'upi';
+    else if (txt.indexOf('whatsapp') > -1 || txt.indexOf('wa') > -1) payMethod = 'whatsapp';
+    else if (txt.indexOf('cod') > -1 || txt.indexOf('cash') > -1) payMethod = 'cod';
+  }
+
+  var orderData = {
+    items: cart.slice(),
+    total: grand,
+    subtotal: cart.reduce(function(s,i){return s+i.price*i.qty;},0),
+    shipping: grand - cart.reduce(function(s,i){return s+i.price*i.qty;},0),
+    date: new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}),
+    status: payMethod === 'cod' ? 'pending' : 'confirmed',
+    paymentMethod: payMethod,
+    address: {name:name,email:email,phone:phone,address:addr,city:city,state:state,pincode:pin},
+    userId: currentUser ? currentUser.uid : 'guest'
+  };
+
+  // If Stripe card payment is configured and selected
+  if (payMethod === 'card' && stripe && stripeCardElement) {
+    stripe.createPaymentMethod({ type: 'card', card: stripeCardElement }).then(function(result) {
+      if (result.error) {
+        var errEl = document.getElementById('stripe-error');
+        if (errEl) errEl.textContent = result.error.message;
+        if (btn) { btn.disabled = false; btn.textContent = 'Place Order'; }
+        toast(result.error.message, 'error');
+      } else {
+        orderData.stripePaymentMethodId = result.paymentMethod.id;
+        finalizeOrder(orderData, payMethod, grand);
+      }
+    });
+  } else {
+    // Simulate processing for demo / non-Stripe payments
+    setTimeout(function() { finalizeOrder(orderData, payMethod, grand); }, 1500);
+  }
 }
 
-function goOrders(){
-  if(!user){showPage('page-signin');return;}
-  renderOrders();showPage('page-orders');
+function finalizeOrder(orderData, payMethod, grand) {
+  var orderId = 'VIV' + (Date.now() + '').slice(-8).toUpperCase();
+  orderData.id = orderId;
+
+  // Save to Firestore if configured
+  if (db && currentUser) {
+    db.collection('orders').add(orderData).then(function(ref) {
+      orderData.firestoreId = ref.id;
+    }).catch(function(e) { console.warn('Firestore save failed:', e); });
+  }
+
+  // Save locally as backup
+  orders.unshift(orderData);
+  saveOrders();
+  cart = [];
+  saveCart();
+  updateCartUI();
+
+  document.getElementById('success-order-id').textContent = 'Order #' + orderId;
+  showPage('page-success');
+  toast('Order placed successfully!', 'success');
+
+  // If WhatsApp payment, open WA
+  if (payMethod === 'whatsapp') {
+    setTimeout(function() {
+      var msg = encodeURIComponent('Hi Vivara! I just placed Order #' + orderId + '. Items: ' + orderData.items.map(function(i){return i.name+' x'+i.qty;}).join(', ') + '. Total: ₹' + grand + '. Please share payment details.');
+      window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
+    }, 1000);
+  }
 }
 
-function renderOrders(){
-  var el=document.getElementById('orders-list');
-  if(!orders.length){
-    el.innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)"><p style="font-family:\'Cormorant Garamond\',serif;font-size:24px;margin-bottom:1rem">No orders yet</p><button class="btn-primary" onclick="showHome(\'all\')">Start Shopping</button></div>';
+// ============================================================
+// ORDERS PAGE
+// ============================================================
+function renderOrders() {
+  var el = document.getElementById('orders-list');
+
+  // Try Firestore first
+  if (db && currentUser) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center"><span class="spinner"></span></div>';
+    db.collection('orders').where('userId','==',currentUser.uid).orderBy('date','desc').get()
+      .then(function(snap) {
+        var fbOrders = snap.docs.map(function(d) { return Object.assign({id:d.id},d.data()); });
+        if (fbOrders.length > 0) { renderOrdersList(el, fbOrders); return; }
+        renderOrdersList(el, orders.filter(function(o){return !currentUser || o.userId===currentUser.uid || o.userId==='guest';}));
+      }).catch(function() {
+        renderOrdersList(el, orders);
+      });
+  } else {
+    renderOrdersList(el, orders);
+  }
+}
+
+function renderOrdersList(el, list) {
+  if (!list || !list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted)"><p style="font-family:\'Cormorant Garamond\',serif;font-size:24px;margin-bottom:1rem">No orders yet</p><p style="font-size:14px;margin-bottom:2rem">Your order history will appear here.</p><button class="btn-primary" onclick="showHome(\'all\')">Start Shopping</button></div>';
     return;
   }
-  el.innerHTML=orders.map(function(o){
-    var itemsHTML=(o.items||[]).map(function(i){return '<div style="display:flex;justify-content:space-between;margin-bottom:.75rem;font-size:14px"><div><div>'+i.name+'</div><div style="font-size:12px;color:var(--muted)">Size '+i.size+' &middot; Qty '+i.qty+'</div></div><div style="font-weight:500">&#8377;'+(i.price*i.qty).toLocaleString()+'</div></div>';}).join('');
-    return '<div class="order-card"><div class="order-header"><div><div class="order-id-text">Order #'+o.id+'</div><div class="order-date">'+o.date+'</div></div><span class="status-confirmed">'+o.status+'</span></div><div class="order-body">'+itemsHTML+'<div style="display:flex;justify-content:space-between;padding-top:1rem;margin-top:.5rem;border-top:1px solid var(--border);font-weight:500"><span>Total</span><span>&#8377;'+o.total.toLocaleString()+'</span></div></div></div>';
+  el.innerHTML = list.map(function(o) {
+    var itemsHTML = (o.items || []).map(function(i) {
+      return '<div style="display:flex;justify-content:space-between;margin-bottom:.75rem;font-size:14px"><div><div>' + i.name + '</div><div style="font-size:12px;color:var(--muted)">Size ' + i.size + ' &middot; Qty ' + i.qty + '</div></div><div style="font-weight:500">&#8377;' + (i.price * i.qty).toLocaleString() + '</div></div>';
+    }).join('');
+    var statusClass = o.status === 'confirmed' ? 'status-confirmed' : 'status-pending';
+    var addrStr = o.address ? (o.address.address + ', ' + o.address.city + ' ' + o.address.pincode) : '';
+    var waMsg = encodeURIComponent('Hi! I need help with Order #' + (o.id||'').slice(-8).toUpperCase());
+    return '<div class="order-card"><div class="order-header"><div><div class="order-id-text">Order #' + (o.id||'').slice(-8).toUpperCase() + '</div><div class="order-date">' + o.date + '</div></div><span class="status-badge ' + statusClass + '">' + (o.status||'confirmed') + '</span></div>'
+      + '<div class="order-body">' + itemsHTML
+      + '<div style="display:flex;justify-content:space-between;padding-top:1rem;margin-top:.5rem;border-top:1px solid var(--border);font-weight:500"><span>Total</span><span>&#8377;' + (o.total||0).toLocaleString() + '</span></div>'
+      + (addrStr ? '<div style="font-size:12px;color:var(--muted);margin-top:.75rem">&#128230; Delivering to: ' + addrStr + '</div>' : '')
+      + '<div style="margin-top:1rem"><a href="https://wa.me/' + WHATSAPP_NUMBER + '?text=' + waMsg + '" target="_blank" style="font-size:12px;color:#25D366;text-decoration:none">&#128172; Track or query via WhatsApp</a></div>'
+      + '</div></div>';
   }).join('');
 }
 
-function switchAuthTab(mode){
-  authMode=mode;
-  document.getElementById('tab-signin').classList.toggle('active',mode==='signin');
-  document.getElementById('tab-signup').classList.toggle('active',mode==='signup');
-  document.getElementById('auth-sub').textContent=mode==='signin'?'Welcome back':'Create your account';
-  document.getElementById('auth-submit-btn').textContent=mode==='signin'?'Sign In':'Create Account';
-  document.getElementById('field-name').style.display=mode==='signup'?'block':'none';
-  document.getElementById('auth-error').style.display='none';
+// ============================================================
+// AUTH
+// ============================================================
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('tab-signin').classList.toggle('active', mode === 'signin');
+  document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+  document.getElementById('auth-sub').textContent = mode === 'signin' ? 'Welcome back' : 'Create your account';
+  document.getElementById('auth-submit-btn').textContent = mode === 'signin' ? 'Sign In' : 'Create Account';
+  document.getElementById('field-name').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
 }
 
-function handleAuth(){
-  var email=document.getElementById('auth-email').value.trim();
-  var pwd=document.getElementById('auth-password').value;
-  var name=document.getElementById('auth-name')&&document.getElementById('auth-name').value.trim();
-  if(!email||!pwd){showAuthError('Please fill in all fields');return;}
-  if(authMode==='signup'&&!name){showAuthError('Please enter your name');return;}
-  if(pwd.length<6){showAuthError('Password must be at least 6 characters');return;}
-  user={name:authMode==='signup'?name:email.split('@')[0],email:email,uid:'user_'+Date.now()};
-  saveUser();updateNav();
-  toast(authMode==='signup'?'Welcome to Vivara, '+name+'!':'Welcome back!','success');
-  showHome('all');
-}
+function handleAuth() {
+  var email = document.getElementById('auth-email').value.trim();
+  var pwd = document.getElementById('auth-password').value;
+  var name = document.getElementById('auth-name') && document.getElementById('auth-name').value.trim();
+  if (!email || !pwd) { showAuthMsg('Please fill in all fields', 'error'); return; }
+  if (pwd.length < 6) { showAuthMsg('Password must be at least 6 characters', 'error'); return; }
+  if (authMode === 'signup' && !name) { showAuthMsg('Please enter your name', 'error'); return; }
 
-function handleGoogleSignIn(){
-  user={name:'Google User',email:'google@vivara.in',uid:'google_'+Date.now()};
-  saveUser();updateNav();
-  toast('Welcome to Vivara!','success');
-  showHome('all');
-}
+  var btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span>';
 
-function showAuthError(msg){
-  var el=document.getElementById('auth-error');
-  el.textContent=msg;el.style.display='block';
-}
-
-function signOut(){
-  user=null;saveUser();updateNav();
-  toast('Signed out successfully');
-  showHome('all');
-}
-
-function handleNavUser(){
-  if(user){
-    document.getElementById('account-avatar').textContent=(user.name||'V').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2)||'V';
-    document.getElementById('account-name').textContent=user.name;
-    document.getElementById('account-email').textContent=user.email;
-    document.getElementById('edit-name').value=user.name;
-    showPage('page-account');
+  if (firebaseReady && fbAuth) {
+    if (authMode === 'signup') {
+      fbAuth.createUserWithEmailAndPassword(email, pwd)
+        .then(function(cred) { return cred.user.updateProfile({displayName: name}); })
+        .then(function() { toast('Welcome to Vivara, ' + name + '!', 'success'); showHome('all'); })
+        .catch(function(e) { showAuthMsg(firebaseErrMsg(e.code), 'error'); btn.disabled = false; btn.textContent = 'Create Account'; });
+    } else {
+      fbAuth.signInWithEmailAndPassword(email, pwd)
+        .then(function() { toast('Welcome back!', 'success'); showHome('all'); })
+        .catch(function(e) { showAuthMsg(firebaseErrMsg(e.code), 'error'); btn.disabled = false; btn.textContent = 'Sign In'; });
+    }
   } else {
-    showPage('page-signin');
+    // Demo mode (no Firebase configured)
+    setTimeout(function() {
+      currentUser = {uid:'demo_'+Date.now(), name: authMode==='signup'?name:email.split('@')[0], email:email};
+      updateNav();
+      toast(authMode==='signup'?'Welcome to Vivara, '+name+'!':'Welcome back!','success');
+      showHome('all');
+    }, 800);
   }
 }
 
-function saveProfile(){
-  var n=document.getElementById('edit-name').value.trim();
-  if(!n) return;
-  user.name=n;saveUser();updateNav();
-  toast('Profile updated','success');
-}
-
-function updateNav(){
-  var btn=document.getElementById('nav-user-btn');
-  if(user){
-    btn.textContent=(user.name||'Account').split(' ')[0];
-    btn.onclick=handleNavUser;
+function handleGoogleSignIn() {
+  if (firebaseReady && fbAuth) {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(provider)
+      .then(function() { toast('Welcome to Vivara!', 'success'); showHome('all'); })
+      .catch(function(e) { showAuthMsg('Google sign-in failed. Please try again.', 'error'); });
   } else {
-    btn.textContent='Sign In';
-    btn.onclick=handleNavUser;
+    // Demo mode
+    currentUser = {uid:'google_'+Date.now(), name:'Google User', email:'google@example.com'};
+    updateNav();
+    toast('Welcome to Vivara!', 'success');
+    showHome('all');
   }
 }
 
-async function getAI(){
-  var q=document.getElementById('ai-input').value.trim();
-  if(!q) return;
-  var btn=document.querySelector('.ai-submit');
-  btn.textContent='...';btn.disabled=true;
-  document.getElementById('ai-result').style.display='none';
-  var inStockNames=products.filter(function(p){return p.inStock;}).map(function(p){return p.name+' ('+p.material+', Rs.'+p.price+')';}).join(', ');
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
-        system:'You are Vivara\'s personal style AI for an Indian women\'s clothing brand. Current collection: '+inStockNames+'. Give a warm, personalized 2-3 sentence recommendation mentioning actual product names and prices.',
-        messages:[{role:'user',content:q}]})
+function firebaseErrMsg(code) {
+  var msgs = {
+    'auth/email-already-in-use': 'This email is already registered. Try signing in.',
+    'auth/user-not-found': 'No account found. Please create an account.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/invalid-credential': 'Incorrect email or password.',
+    'auth/weak-password': 'Password must be at least 6 characters.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/too-many-requests': 'Too many attempts. Please try again later.'
+  };
+  return msgs[code] || 'Something went wrong. Please try again.';
+}
+
+function showAuthMsg(msg, type) {
+  var errEl = document.getElementById('auth-error');
+  var sucEl = document.getElementById('auth-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  if (type === 'error') { errEl.textContent = msg; errEl.style.display = 'block'; }
+  else { sucEl.textContent = msg; sucEl.style.display = 'block'; }
+}
+
+function doSignOut() {
+  closeUserDropdown();
+  if (firebaseReady && fbAuth) {
+    fbAuth.signOut().then(function() { currentUser = null; updateNav(); toast('Signed out'); showHome('all'); });
+  } else {
+    currentUser = null; updateNav(); toast('Signed out'); showHome('all');
+  }
+}
+
+// ============================================================
+// AI STYLIST
+// ============================================================
+async function getAI() {
+  var q = document.getElementById('ai-input') && document.getElementById('ai-input').value.trim();
+  if (!q) return;
+  var btn = document.querySelector('.ai-submit');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  var resultEl = document.getElementById('ai-result');
+  var textEl = document.getElementById('ai-result-text');
+  if (resultEl) resultEl.style.display = 'none';
+
+  if (!ANTHROPIC_KEY) {
+    var suggestions = {
+      'diwali': 'For Diwali, our Ananya Block Print Kurti (&#8377;1299) in Rose is a stunning choice — the traditional motifs make it festive yet refined. Pair it with statement jhumkas and you\'re celebration-ready!',
+      'office': 'Our Ivory Embroidered Kurti in Mul Cotton (&#8377;1599) is perfect for the office — light, professional, and effortlessly elegant. The white-on-white embroidery adds subtle sophistication.',
+      'brunch': 'The Sage Green Co-ord Set in Linen Blend (&#8377;2499) is made for brunches — relaxed, stylish, and so easy to style with block heels or kolhapuris.',
+      'wedding': 'For a wedding guest look, the Autumn Rust Co-ord in Chanderi Silk (&#8377;3299) is breathtaking. The natural sheen of chanderi catches every light beautifully.'
+    };
+    var lq = q.toLowerCase();
+    var answer = suggestions['diwali'];
+    for (var key in suggestions) { if (lq.indexOf(key) > -1) { answer = suggestions[key]; break; } }
+    if (textEl) textEl.innerHTML = answer;
+    if (resultEl) resultEl.style.display = 'block';
+    if (btn) { btn.textContent = 'Style me'; btn.disabled = false; }
+    return;
+  }
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 300,
+        system: 'You are Vivara\'s personal style AI for an Indian women\'s clothing brand. Collection: ' + products.filter(function(p){return p.inStock;}).map(function(p){return p.name+' ('+p.material+', ₹'+p.price+')';}).join(', ') + '. Give a warm, 2-3 sentence recommendation mentioning product names and prices. Sound like a knowledgeable, friendly stylist.',
+        messages: [{role:'user',content:q}]
+      })
     });
-    var data=await res.json();
-    var text=(data.content&&data.content[0]&&data.content[0].text)||'Let me suggest something beautiful for you...';
-    document.getElementById('ai-result-text').textContent=text;
-    document.getElementById('ai-result').style.display='block';
-  } catch(e){
-    document.getElementById('ai-result-text').textContent='Our stylist is unavailable right now. Please try again shortly.';
-    document.getElementById('ai-result').style.display='block';
+    var data = await res.json();
+    var text = (data.content && data.content[0] && data.content[0].text) || '';
+    if (textEl) textEl.textContent = text;
+    if (resultEl) resultEl.style.display = 'block';
+  } catch(e) {
+    if (textEl) textEl.textContent = 'Our stylist is unavailable right now. Please chat with us on WhatsApp!';
+    if (resultEl) resultEl.style.display = 'block';
   }
-  btn.textContent='Style me';btn.disabled=false;
+  if (btn) { btn.textContent = 'Style me'; btn.disabled = false; }
 }
 
-function renderFooter(){
+// ============================================================
+// FOOTER
+// ============================================================
+function renderFooter() {
   return '<footer><div class="footer-grid">'
-    +'<div><div class="footer-brand">Vivara</div><p style="font-size:13px;line-height:1.6">Crafting elegance for the modern Indian woman. Every piece, a celebration.</p></div>'
-    +'<div><div class="footer-col-title">Shop</div>'
-    +'<button class="footer-link" onclick="showHome(\'kurti\')">Kurtis</button>'
-    +'<button class="footer-link" onclick="showHome(\'coord\')">Co-ords</button>'
-    +'<button class="footer-link" onclick="showHome(\'fabric\')">Fabrics</button>'
-    +'<button class="footer-link" onclick="showHome(\'new\')">New arrivals</button>'
-    +'</div>'
-    +'<div><div class="footer-col-title">Help</div>'
-    +'<button class="footer-link" onclick="showPage(\'page-sizeguide\')">Size guide</button>'
-    +'<button class="footer-link" onclick="toast(\'Shipping info coming soon\')">Shipping</button>'
-    +'<button class="footer-link" onclick="toast(\'Returns info coming soon\')">Returns</button>'
-    +'</div>'
-    +'<div><div class="footer-col-title">Brand</div>'
-    +'<button class="footer-link" onclick="toast(\'About page coming soon\')">About Vivara</button>'
-    +'<button class="footer-link" onclick="toast(\'Follow us @vivaraofficial\')">Instagram</button>'
-    +'</div></div>'
-    +'<div class="footer-bottom"><span>&copy; 2025 Vivara. All rights reserved.</span><span>Made with care in India</span></div>'
-    +'</footer>';
+    + '<div><div class="footer-brand">Vivara</div>'
+    + '<p style="font-size:13px;line-height:1.7;margin-bottom:1rem">Handpicked &amp; curated with love.<br>Celebrating the modern Indian woman.</p>'
+    + '<div class="footer-social">'
+    + '<a href="https://www.instagram.com/vivara.in/" target="_blank" class="footer-social-btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff" title="Instagram">&#128247;</a>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" class="footer-social-btn" style="background:#25D366;color:#fff" title="WhatsApp">&#128172;</a>'
+    + '</div></div>'
+    + '<div><div class="footer-col-title">Shop</div>'
+    + '<button class="footer-link" onclick="showHome(\'kurti\')">Kurtis</button>'
+    + '<button class="footer-link" onclick="showHome(\'coord\')">Co-ords</button>'
+    + '<button class="footer-link" onclick="showHome(\'fabric\')">Fabrics</button>'
+    + '<button class="footer-link" onclick="showHome(\'new\')">New arrivals</button>'
+    + '<button class="footer-link" onclick="showHome(\'sale\')">Sale</button>'
+    + '</div>'
+    + '<div><div class="footer-col-title">Help</div>'
+    + '<button class="footer-link" onclick="showPage(\'page-sizeguide\')">Size guide</button>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '?text=Hi%20Vivara!%20I%20have%20a%20shipping%20query." target="_blank" class="footer-link">Shipping info</a>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '?text=Hi%20Vivara!%20I%20want%20to%20return%20an%20item." target="_blank" class="footer-link">Returns</a>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" class="footer-link">Contact us</a>'
+    + '</div>'
+    + '<div><div class="footer-col-title">Connect</div>'
+    + '<a href="https://www.instagram.com/vivara.in/" target="_blank" class="footer-link">&#128247; @vivara.in</a>'
+    + '<a href="https://wa.me/' + WHATSAPP_NUMBER + '" target="_blank" class="footer-link">&#128172; WhatsApp</a>'
+    + '<button class="footer-link" onclick="showPage(\'page-about\');renderAbout()">Our story</button>'
+    + '</div></div>'
+    + '<div class="footer-bottom"><span>&copy; 2025 Vivara. All rights reserved.</span><span>Handpicked with love in India &#127968;</span></div>'
+    + '</footer>';
 }
 
-function openAdmin(){document.getElementById('admin-overlay').classList.add('open');renderAdminList();}
-function closeAdmin(){document.getElementById('admin-overlay').classList.remove('open');}
+// ============================================================
+// ADMIN (accessed via URL hash #admin)
+// ============================================================
+window.addEventListener('hashchange', function() {
+  if (window.location.hash === '#admin') openAdmin();
+});
+if (window.location.hash === '#admin') setTimeout(openAdmin, 500);
 
-function renderAdminList(){
-  document.getElementById('admin-prod-count').textContent=products.length;
-  var el=document.getElementById('admin-prod-list');
-  el.innerHTML=products.map(function(p){
-    var imgContent=p.image?('<img src="'+p.image+'" alt="'+p.name+'"/>'):p.icon;
-    return '<div class="admin-prod-item'+(adminSelectedId===p.id?' selected':'')+'" onclick="adminSelectProduct(\''+p.id+'\')">'
-      +'<div class="admin-prod-thumb" style="background:'+p.gradient+'">'+imgContent+'</div>'
-      +'<div class="admin-prod-info"><div class="admin-prod-name">'+p.name+'</div><div class="admin-prod-price">&#8377;'+p.price.toLocaleString()+'</div></div>'
-      +'<span class="admin-prod-status '+(p.inStock?'status-in':'status-out')+'">'+(p.inStock?'In Stock':'Sold Out')+'</span>'
-      +'</div>';
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  document.getElementById('admin-login-screen').style.display = adminUnlocked ? 'none' : 'block';
+  document.getElementById('admin-panel-body').style.display = adminUnlocked ? 'grid' : 'none';
+  if (adminUnlocked) renderAdminList();
+}
+
+function closeAdmin() {
+  document.getElementById('admin-overlay').classList.remove('open');
+  window.location.hash = '';
+}
+
+function checkAdminPwd() {
+  var pwd = document.getElementById('admin-pwd-input').value;
+  if (pwd === ADMIN_PASSWORD) {
+    adminUnlocked = true;
+    document.getElementById('admin-login-screen').style.display = 'none';
+    document.getElementById('admin-panel-body').style.display = 'grid';
+    renderAdminList();
+  } else {
+    document.getElementById('admin-pwd-error').style.display = 'block';
+    document.getElementById('admin-pwd-input').value = '';
+  }
+}
+
+function renderAdminList() {
+  document.getElementById('admin-prod-count').textContent = products.length;
+  var el = document.getElementById('admin-prod-list');
+  el.innerHTML = products.map(function(p) {
+    var img = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '"/>') : p.icon;
+    return '<div class="admin-prod-item' + (adminSelectedId === p.id ? ' selected' : '') + '" onclick="adminSelectProduct(\'' + p.id + '\')">'
+      + '<div class="admin-prod-thumb" style="background:' + p.gradient + '">' + img + '</div>'
+      + '<div class="admin-prod-info"><div class="admin-prod-name">' + p.name + '</div><div class="admin-prod-price">&#8377;' + p.price.toLocaleString() + '</div></div>'
+      + '<span class="admin-prod-status ' + (p.inStock ? 'status-in' : 'status-out') + '">' + (p.inStock ? 'In Stock' : 'Sold Out') + '</span>'
+      + '</div>';
   }).join('');
 }
 
-function adminSelectProduct(id){
-  adminSelectedId=id;
+function adminSelectProduct(id) {
+  adminSelectedId = id;
   renderAdminList();
-  var p=products.find(function(x){return x.id===id;});
-  if(p) renderAdminForm(p);
+  var p = products.find(function(x) { return x.id === id; });
+  if (p) renderAdminForm(p);
 }
 
-function renderAdminForm(p){
-  var main=document.getElementById('admin-main');
-  var imgContent=p.image?('<img src="'+p.image+'" alt="preview"/>'):('<div class="img-preview-placeholder">No image — upload to imgbb.com and paste URL</div>');
-  main.innerHTML='<div class="admin-main-title">Editing: '+p.name+'</div>'
-    +'<div class="stock-toggle-row">'
-    +'<div><div class="stock-toggle-label">'+(p.inStock?'In Stock':'Sold Out')+'</div>'
-    +'<div class="stock-toggle-sub">'+(p.inStock?'Toggle off to mark as Sold Out':'Toggle on to mark as In Stock')+'</div></div>'
-    +'<label class="toggle"><input type="checkbox" id="admin-instock"'+(p.inStock?' checked':'')
-    +' onchange="adminToggleStock(\''+p.id+'\',this.checked)"/><span class="toggle-slider"></span></label>'
-    +'</div>'
-    +'<div class="admin-form-grid">'
-    +'<div class="admin-field full"><label>Product Name</label><input id="af-name" value="'+p.name+'"/></div>'
-    +'<div class="admin-field"><label>Price (&#8377;)</label><input id="af-price" type="number" value="'+p.price+'"/></div>'
-    +'<div class="admin-field"><label>Old Price (&#8377;) — 0 if none</label><input id="af-oldprice" type="number" value="'+(p.oldPrice||0)+'"/></div>'
-    +'<div class="admin-field"><label>Material</label><input id="af-material" value="'+p.material+'"/></div>'
-    +'<div class="admin-field"><label>Category</label><select id="af-category">'
-    +'<option value="kurti"'+(p.category==='kurti'?' selected':'')+'>Kurti</option>'
-    +'<option value="coord"'+(p.category==='coord'?' selected':'')+'>Co-ord</option>'
-    +'<option value="fabric"'+(p.category==='fabric'?' selected':'')+'>Fabric</option>'
-    +'</select></div>'
-    +'<div class="admin-field"><label>Badge (New / Sale / Luxury / blank)</label><input id="af-badge" value="'+(p.badge||'')+'"/></div>'
-    +'<div class="admin-field"><label>Sizes (comma separated)</label><input id="af-sizes" value="'+((p.sizes||[]).join(', '))+'"/></div>'
-    +'<div class="admin-field"><label>Colors (comma separated)</label><input id="af-colors" value="'+((p.colors||[]).join(', '))+'"/></div>'
-    +'<div class="admin-field full"><label>Description</label><textarea id="af-desc">'+p.description+'</textarea></div>'
-    +'<div class="admin-field full">'
-    +'<label>Product Image URL</label>'
-    +'<input id="af-image" value="'+(p.image||'')+'" placeholder="https://i.ibb.co/... paste from imgbb.com"/>'
-    +'<div class="img-preview" id="af-img-preview">'+imgContent+'</div>'
-    +'<div style="font-size:11px;color:var(--muted);margin-top:.5rem">&#128161; Upload your photo to <a href="https://imgbb.com" target="_blank" style="color:var(--rose)">imgbb.com</a> (free), copy the Direct link, paste above.</div>'
-    +'<button style="margin-top:.5rem;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--border);color:var(--charcoal);padding:6px 14px;border-radius:2px" onclick="previewImg()">Preview Image</button>'
-    +'</div></div>'
-    +'<div class="admin-actions">'
-    +'<button class="save-btn" onclick="adminSave(\''+p.id+'\')">Save Changes</button>'
-    +'<button class="delete-btn" onclick="adminDelete(\''+p.id+'\')">Delete Product</button>'
-    +'</div>';
+function renderAdminForm(p) {
+  var main = document.getElementById('admin-main');
+  var imgPrev = p.image ? ('<img src="' + p.image + '" alt="preview"/>') : '<div class="img-preview-placeholder">No image<br><span style="font-size:10px">Upload to imgbb.com and paste URL</span></div>';
+  main.innerHTML = '<div class="admin-main-title">Editing: ' + p.name + '</div>'
+    + '<div class="stock-toggle-row">'
+    + '<div><div class="stock-toggle-label">' + (p.inStock ? '&#9989; In Stock' : '&#128308; Sold Out') + '</div>'
+    + '<div class="stock-toggle-sub">' + (p.inStock ? 'Toggle to mark as Sold Out' : 'Toggle to mark as In Stock') + '</div></div>'
+    + '<label class="toggle"><input type="checkbox" id="admin-instock"' + (p.inStock ? ' checked' : '') + ' onchange="adminToggleStock(\'' + p.id + '\',this.checked)"/><span class="toggle-slider"></span></label>'
+    + '</div>'
+    + '<div class="admin-form-grid">'
+    + '<div class="admin-field full"><label>Product Name</label><input id="af-name" value="' + p.name + '"/></div>'
+    + '<div class="admin-field"><label>Price (&#8377;)</label><input id="af-price" type="number" value="' + p.price + '"/></div>'
+    + '<div class="admin-field"><label>Old/Original Price (0 = none)</label><input id="af-oldprice" type="number" value="' + (p.oldPrice || 0) + '"/></div>'
+    + '<div class="admin-field"><label>Material</label><input id="af-material" value="' + p.material + '"/></div>'
+    + '<div class="admin-field"><label>Category</label><select id="af-category"><option value="kurti"' + (p.category==='kurti'?' selected':'') + '>Kurti</option><option value="coord"' + (p.category==='coord'?' selected':'') + '>Co-ord</option><option value="fabric"' + (p.category==='fabric'?' selected':'') + '>Fabric</option></select></div>'
+    + '<div class="admin-field"><label>Badge (New / Sale / Luxury — leave blank for none)</label><input id="af-badge" value="' + (p.badge || '') + '"/></div>'
+    + '<div class="admin-field"><label>Sizes (comma separated)</label><input id="af-sizes" value="' + ((p.sizes || []).join(', ')) + '"/></div>'
+    + '<div class="admin-field"><label>Colors (comma separated)</label><input id="af-colors" value="' + ((p.colors || []).join(', ')) + '"/></div>'
+    + '<div class="admin-field full"><label>Description</label><textarea id="af-desc">' + p.description + '</textarea></div>'
+    + '<div class="admin-field full"><label>Product Image URL</label>'
+    + '<input id="af-image" value="' + (p.image || '') + '" placeholder="https://i.ibb.co/... (upload free at imgbb.com)"/>'
+    + '<div class="img-preview" id="af-img-preview">' + imgPrev + '</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-top:.5rem">&#128161; Go to <a href="https://imgbb.com" target="_blank" style="color:var(--rose)">imgbb.com</a>, upload your photo, copy the <strong>Direct link</strong>, paste it above.</div>'
+    + '<button style="margin-top:.5rem;font-size:11px;letter-spacing:1px;background:transparent;border:1px solid var(--border);color:var(--charcoal);padding:6px 14px;border-radius:2px" onclick="previewImg()">Preview Image</button>'
+    + '</div></div>'
+    + '<div class="admin-actions">'
+    + '<button class="save-btn" onclick="adminSave(\'' + p.id + '\')">Save Changes</button>'
+    + '<button class="delete-btn" onclick="adminDelete(\'' + p.id + '\')">Delete Product</button>'
+    + '</div>';
 }
 
-function previewImg(){
-  var url=document.getElementById('af-image').value.trim();
-  var preview=document.getElementById('af-img-preview');
-  if(url){preview.innerHTML='<img src="'+url+'" alt="preview" onerror="this.parentNode.innerHTML=\'<div class=img-preview-placeholder>Image failed to load. Check the URL.</div>\'"/>';}
-  else{preview.innerHTML='<div class="img-preview-placeholder">No image</div>';}
+function previewImg() {
+  var url = document.getElementById('af-image').value.trim();
+  var prev = document.getElementById('af-img-preview');
+  prev.innerHTML = url ? ('<img src="' + url + '" alt="preview" onerror="this.parentNode.innerHTML=\'<div class=img-preview-placeholder>Image failed to load. Check URL.</div>\'"/>') : '<div class="img-preview-placeholder">No image</div>';
 }
 
-function adminToggleStock(id,inStock){
-  var p=products.find(function(x){return x.id===id;});
-  if(!p) return;
-  p.inStock=inStock;
+function adminToggleStock(id, inStock) {
+  var p = products.find(function(x) { return x.id === id; });
+  if (!p) return;
+  p.inStock = inStock;
   saveProducts();
   renderAdminList();
-  var label=document.querySelector('.stock-toggle-label');
-  var sub=document.querySelector('.stock-toggle-sub');
-  if(label) label.textContent=inStock?'In Stock':'Sold Out';
-  if(sub) sub.textContent=inStock?'Toggle off to mark as Sold Out':'Toggle on to mark as In Stock';
-  toast(inStock?'Marked as In Stock - customers can now buy this':'Marked as Sold Out',inStock?'success':'');
-  if(document.getElementById('page-home').classList.contains('active')) renderHome();
+  var lbl = document.querySelector('.stock-toggle-label');
+  var sub = document.querySelector('.stock-toggle-sub');
+  if (lbl) lbl.textContent = inStock ? '&#9989; In Stock' : '&#128308; Sold Out';
+  if (sub) sub.textContent = inStock ? 'Toggle to mark as Sold Out' : 'Toggle to mark as In Stock';
+  toast(inStock ? 'Marked as In Stock' : 'Marked as Sold Out', inStock ? 'success' : '');
+  if (db) {
+    db.collection('products').doc(id).set({inStock: inStock}, {merge: true}).catch(function(){});
+  }
+  if (document.getElementById('page-home').classList.contains('active')) renderHome();
 }
 
-function adminSave(id){
-  var p=products.find(function(x){return x.id===id;});
-  if(!p) return;
-  p.name=document.getElementById('af-name').value.trim()||p.name;
-  p.price=parseInt(document.getElementById('af-price').value)||p.price;
-  var op=parseInt(document.getElementById('af-oldprice').value)||0;
-  p.oldPrice=op>0?op:null;
-  p.material=document.getElementById('af-material').value.trim()||p.material;
-  p.category=document.getElementById('af-category').value;
-  p.badge=document.getElementById('af-badge').value.trim()||null;
-  p.sizes=document.getElementById('af-sizes').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
-  p.colors=document.getElementById('af-colors').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
-  p.description=document.getElementById('af-desc').value.trim()||p.description;
-  p.image=document.getElementById('af-image').value.trim();
+function adminSave(id) {
+  var p = products.find(function(x) { return x.id === id; });
+  if (!p) return;
+  p.name = document.getElementById('af-name').value.trim() || p.name;
+  p.price = parseInt(document.getElementById('af-price').value) || p.price;
+  var op = parseInt(document.getElementById('af-oldprice').value) || 0;
+  p.oldPrice = op > 0 ? op : null;
+  p.material = document.getElementById('af-material').value.trim() || p.material;
+  p.category = document.getElementById('af-category').value;
+  p.badge = document.getElementById('af-badge').value.trim() || null;
+  p.sizes = document.getElementById('af-sizes').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  p.colors = document.getElementById('af-colors').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  p.description = document.getElementById('af-desc').value.trim() || p.description;
+  p.image = document.getElementById('af-image').value.trim();
   saveProducts();
+  if (db) { db.collection('products').doc(id).set(p).catch(function(){}); }
   renderAdminList();
-  toast('Product saved!','success');
-  if(document.getElementById('page-home').classList.contains('active')) renderHome();
+  toast('Product saved!', 'success');
+  if (document.getElementById('page-home').classList.contains('active')) renderHome();
 }
 
-function adminDelete(id){
-  if(!confirm('Delete this product? This cannot be undone.')) return;
-  products=products.filter(function(x){return x.id!==id;});
-  adminSelectedId=null;
+function adminDelete(id) {
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  products = products.filter(function(x) { return x.id !== id; });
+  adminSelectedId = null;
   saveProducts();
+  if (db) { db.collection('products').doc(id).delete().catch(function(){}); }
   renderAdminList();
-  document.getElementById('admin-main').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px">Product deleted.</div>';
+  document.getElementById('admin-main').innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted)">Product deleted.</div>';
   toast('Product deleted');
-  if(document.getElementById('page-home').classList.contains('active')) renderHome();
+  if (document.getElementById('page-home').classList.contains('active')) renderHome();
 }
 
-function adminAddNew(){
-  var id='p_'+Date.now();
-  var newP={id:id,name:'New Product',material:'Cotton',price:999,oldPrice:null,category:'kurti',badge:null,description:'Enter a description for this product.',sizes:['XS','S','M','L','XL'],colors:['Default'],image:'',icon:'&#10022;',gradient:'linear-gradient(135deg,#F0D9CE,#E0B8A2)',inStock:true};
+function adminAddNew() {
+  var id = 'p_' + Date.now();
+  var newP = {id:id,name:'New Product',material:'Cotton',price:999,oldPrice:null,category:'kurti',badge:null,description:'Enter a description for this product.',sizes:['XS','S','M','L','XL'],colors:['Default'],image:'',icon:'&#10022;',gradient:'linear-gradient(135deg,#F0D9CE,#E0B8A2)',inStock:true};
   products.unshift(newP);
   saveProducts();
-  adminSelectedId=id;
+  adminSelectedId = id;
   renderAdminList();
   renderAdminForm(newP);
-  toast('New product added! Fill in the details and click Save Changes.');
+  toast('New product created! Fill in the details and click Save.');
 }
 
+// ============================================================
+// INIT
+// ============================================================
 updateNav();
 renderHome();
 updateCartUI();
